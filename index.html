@@ -5,62 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AirWatch — Air Quality Alerts</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0c0e10" />
+  <meta name="theme-color" content="#faf7f2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="AirWatch" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0c0e10;
-      --surface: #13161a;
-      --border: #1e2229;
-      --text: #e8eaed;
-      --muted: #6b7280;
-      --accent: #4ade80;
+      --bg:         #faf7f2;
+      --surface:    #ffffff;
+      --surface-2:  #f3ede4;
+      --border:     #e8ddd0;
+      --text:       #2d2417;
+      --muted:      #9c8873;
+      --accent:     #e07843;
+      --accent-soft:#fef3e8;
 
-      --good:    #4ade80;
-      --moderate:#facc15;
-      --usg:     #fb923c;
-      --unhealthy:#f87171;
-      --vunhealthy:#c084fc;
-      --hazardous:#fb7185;
+      --good:       #5a9e6f;
+      --moderate:   #d4a843;
+      --usg:        #e07843;
+      --unhealthy:  #c45c3a;
+      --vunhealthy: #8b5cf6;
+      --hazardous:  #be123c;
 
-      --font-head: 'Syne', sans-serif;
-      --font-mono: 'DM Mono', monospace;
+      --font-head: 'Lora', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--font-mono);
+      font-family: var(--font-body);
       min-height: 100vh;
       overflow-x: hidden;
-    }
-
-    /* ── Grid background ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
+      -webkit-font-smoothing: antialiased;
     }
 
     .app {
-      position: relative;
-      z-index: 1;
-      max-width: 680px;
+      max-width: 620px;
       margin: 0 auto;
-      padding: 2rem 1.25rem 4rem;
+      padding: 2rem 1.25rem 5rem;
     }
 
     /* ── Header ── */
@@ -68,198 +59,269 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
     .logo {
       font-family: var(--font-head);
-      font-weight: 800;
-      font-size: 1.6rem;
-      letter-spacing: -0.02em;
+      font-weight: 600;
+      font-size: 1.65rem;
+      letter-spacing: -0.01em;
       color: var(--text);
+      line-height: 1;
     }
 
-    .logo span { color: var(--accent); }
+    .logo span { color: var(--accent); font-style: italic; }
 
     .last-updated {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: var(--muted);
       text-align: right;
-      margin-top: 4px;
+      margin-top: 5px;
     }
 
     /* ── Search bar ── */
     .search-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .search-row input {
       flex: 1;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 11px 18px;
       color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
       outline: none;
-      transition: border-color .2s;
+      transition: border-color .2s, box-shadow .2s;
     }
 
-    .search-row input:focus { border-color: var(--accent); }
+    .search-row input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(224,120,67,.12);
+    }
+
     .search-row input::placeholder { color: var(--muted); }
 
     .btn-loc, .btn-search {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
       color: var(--text);
-      padding: 10px 14px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
+      padding: 11px 18px;
+      font-family: var(--font-body);
+      font-size: 0.84rem;
+      font-weight: 500;
       cursor: pointer;
       transition: border-color .2s, background .2s;
       white-space: nowrap;
     }
 
-    .btn-loc:hover, .btn-search:hover {
+    .btn-search {
+      background: var(--accent);
       border-color: var(--accent);
-      background: rgba(74,222,128,.08);
+      color: #fff;
+    }
+
+    .btn-search:hover { opacity: .88; }
+
+    .btn-loc:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* ── Status / loading ── */
+    #status-msg {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: none;
+      line-height: 1.6;
+    }
+
+    #status-msg.visible { display: block; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Push bar ── */
+    #push-bar {
+      background: var(--accent-soft);
+      border: 1.5px solid #f5d5be;
+      border-radius: var(--radius-md);
+      padding: .9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     /* ── Main AQI card ── */
     #aqi-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.75rem;
-      margin-bottom: 1.25rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 1.75rem 1.5rem;
+      margin-bottom: 1rem;
       position: relative;
       overflow: hidden;
       transition: border-color .4s;
     }
 
-    #aqi-card::before {
+    #aqi-card::after {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--current-color, var(--muted));
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--current-color, var(--border));
       transition: background .4s;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     }
 
     .aqi-location {
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 8px;
+      letter-spacing: .1em;
+      margin-bottom: 12px;
+      font-weight: 500;
     }
 
     .aqi-number-row {
       display: flex;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 4px;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 0;
     }
 
     .aqi-number {
       font-family: var(--font-head);
-      font-size: 5rem;
-      font-weight: 800;
-      line-height: 1;
+      font-size: 5.5rem;
+      font-weight: 600;
+      line-height: .9;
       color: var(--current-color, var(--muted));
       transition: color .4s;
     }
 
-    .aqi-label-col { display: flex; flex-direction: column; gap: 4px; }
+    .aqi-label-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 8px;
+    }
 
     .aqi-status {
       font-family: var(--font-head);
-      font-size: 1.15rem;
-      font-weight: 700;
+      font-size: 1.2rem;
+      font-weight: 600;
       color: var(--current-color, var(--muted));
       transition: color .4s;
+      line-height: 1.2;
     }
 
-    .aqi-unit { font-size: 0.7rem; color: var(--muted); }
+    .aqi-unit {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: .02em;
+    }
 
-    /* ── Alert banner ── */
+    /* ── Advice / alert banner ── */
     #alert-banner {
       display: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 1.25rem;
-      border-left: 3px solid var(--current-color, var(--muted));
-      background: rgba(255,255,255,.04);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+      background: var(--accent-soft);
+      border: 1.5px solid #f5d5be;
+      border-left: 4px solid var(--current-color, var(--accent));
     }
 
     #alert-banner.visible { display: block; }
 
     .alert-title {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--current-color, var(--text));
-      margin-bottom: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
     }
 
     .alert-tips { list-style: none; }
 
     .alert-tips li {
-      font-size: 0.73rem;
-      color: var(--muted);
+      font-size: 0.8rem;
+      color: #6b4c2a;
       padding: 3px 0;
       display: flex;
-      gap: 8px;
+      gap: 10px;
+      line-height: 1.5;
     }
 
     .alert-tips li::before {
-      content: '→';
-      color: var(--current-color, var(--muted));
+      content: '·';
+      color: var(--current-color, var(--accent));
+      font-size: 1.2rem;
+      line-height: 1.1;
       flex-shrink: 0;
     }
 
     /* ── Pollutant grid ── */
     .pollutants-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      margin-bottom: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-bottom: 1rem;
     }
 
     .pollutant-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: .9rem 1rem;
     }
 
     .pollutant-name {
-      font-size: 0.65rem;
+      font-size: 0.67rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .1em;
       margin-bottom: 6px;
+      font-weight: 500;
     }
 
     .pollutant-value {
       font-family: var(--font-head);
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.55rem;
+      font-weight: 600;
       color: var(--text);
+      line-height: 1;
     }
 
     .pollutant-unit {
-      font-size: 0.62rem;
+      font-size: 0.65rem;
       color: var(--muted);
       margin-left: 2px;
+      font-family: var(--font-body);
     }
 
     .pollutant-bar-bg {
       height: 3px;
-      background: var(--border);
+      background: var(--surface-2);
       border-radius: 2px;
       margin-top: 10px;
       overflow: hidden;
@@ -273,90 +335,65 @@
 
     /* ── Station info ── */
     #station-info {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      font-size: 0.72rem;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: .75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.75rem;
       color: var(--muted);
     }
 
-    #station-info strong { color: var(--text); }
+    #station-info strong { color: var(--text); font-weight: 500; }
 
-    /* ── AQI scale legend ── */
+    /* ── AQI scale ── */
+    #scale-section { margin-bottom: 1.5rem; }
+
     .scale {
       display: flex;
-      gap: 4px;
-      margin-bottom: 1.5rem;
+      gap: 3px;
+      margin-bottom: .4rem;
+      border-radius: 4px;
+      overflow: hidden;
     }
 
-    .scale-seg {
-      flex: 1;
-      height: 6px;
-      border-radius: 3px;
-    }
+    .scale-seg { flex: 1; height: 5px; }
 
     .scale-labels {
       display: flex;
       justify-content: space-between;
       font-size: 0.6rem;
       color: var(--muted);
-      margin-top: 4px;
     }
-
-    /* ── Loading / error states ── */
-    #status-msg {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--muted);
-      font-size: 0.8rem;
-      display: none;
-    }
-
-    #status-msg.visible { display: block; }
-
-    .spinner {
-      display: inline-block;
-      width: 18px; height: 18px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Threshold controls ── */
     #threshold-section {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
       margin-bottom: 1.25rem;
     }
 
     .threshold-title {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .08em;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      font-weight: 500;
     }
 
     .threshold-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .threshold-row label {
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      width: 80px;
+      width: 72px;
       flex-shrink: 0;
     }
 
@@ -367,24 +404,29 @@
     }
 
     .threshold-val {
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: var(--text);
-      width: 52px;
+      width: 58px;
       text-align: right;
+      font-weight: 500;
     }
 
+    /* ── Footer ── */
     footer {
       text-align: center;
-      font-size: 0.65rem;
+      font-size: 0.68rem;
       color: var(--muted);
       margin-top: 2rem;
+      line-height: 1.8;
     }
 
     footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
 
     /* ── Responsive ── */
     @media (max-width: 480px) {
-      .aqi-number { font-size: 3.5rem; }
+      .aqi-number { font-size: 4rem; }
+      .search-row input { border-radius: 50px; }
     }
   </style>
 </head>
@@ -409,9 +451,9 @@
   <div id="status-msg"></div>
 
   <!-- Push notifications opt-in -->
-  <div id="push-bar" style="display:none; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.85rem 1.25rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-    <span style="font-size:.72rem; color:var(--muted); flex:1">Get notified when AQI crosses your threshold — even with the tab closed.</span>
-    <button id="push-btn" onclick="enablePush()" style="background:var(--accent); color:#0c0e10; border:none; border-radius:6px; padding:6px 14px; font-family:var(--font-mono); font-size:.72rem; font-weight:500; cursor:pointer; white-space:nowrap;">Enable alerts</button>
+  <div id="push-bar" style="display:none">
+    <span style="font-size:.78rem; color:#6b4c2a; flex:1; line-height:1.5">Get notified when air quality crosses your threshold — even with the tab closed.</span>
+    <button id="push-btn" onclick="enablePush()" style="background:var(--accent); color:#fff; border:none; border-radius:50px; padding:8px 16px; font-family:var(--font-body); font-size:.78rem; font-weight:500; cursor:pointer; white-space:nowrap;">Enable alerts</button>
   </div>
 
   <!-- Main AQI card -->
@@ -755,7 +797,7 @@ async function enablePush() {
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
     document.getElementById('push-btn').textContent = 'Blocked — allow in browser settings';
-    document.getElementById('push-btn').style.background = 'var(--unhealthy)';
+    document.getElementById('push-btn').style.background = '#c45c3a';
     return;
   }
 
@@ -776,8 +818,8 @@ function updatePushBtn(enabled) {
   if (enabled) {
     btn.textContent = '✓ Alerts on';
     btn.style.background = 'transparent';
-    btn.style.border = '1px solid var(--accent)';
-    btn.style.color = 'var(--accent)';
+    btn.style.border = '1.5px solid var(--accent)';
+    btn.style.color = 'var(--accent)'; btn.style.background = 'var(--accent-soft)';
     btn.onclick = null;
     btn.style.cursor = 'default';
   }
@@ -821,7 +863,7 @@ function maybeNotify(aqi, stationName, category) {
     const header = document.querySelector('header');
     const installBtn = document.createElement('button');
     installBtn.textContent = '⬇ Install app';
-    installBtn.style.cssText = 'background:transparent;border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;cursor:pointer;margin-top:4px;';
+    installBtn.style.cssText = 'background:var(--accent);color:#fff;border:none;border-radius:50px;font-family:var(--font-body);font-size:.75rem;font-weight:500;padding:7px 14px;cursor:pointer;margin-top:2px;';
     installBtn.onclick = async () => {
       deferredInstallPrompt.prompt();
       const { outcome } = await deferredInstallPrompt.userChoice;
