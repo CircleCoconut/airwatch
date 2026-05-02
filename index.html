@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirWatch — Air Quality Alerts</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0c0e10" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AirWatch" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0e10;
+      --surface: #13161a;
+      --border: #1e2229;
+      --text: #e8eaed;
+      --muted: #6b7280;
+      --accent: #4ade80;
+
+      --good:    #4ade80;
+      --moderate:#facc15;
+      --usg:     #fb923c;
+      --unhealthy:#f87171;
+      --vunhealthy:#c084fc;
+      --hazardous:#fb7185;
+
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Grid background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .logo span { color: var(--accent); }
+
+    .last-updated {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* ── Search bar ── */
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-row input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .search-row input:focus { border-color: var(--accent); }
+    .search-row input::placeholder { color: var(--muted); }
+
+    .btn-loc, .btn-search {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      white-space: nowrap;
+    }
+
+    .btn-loc:hover, .btn-search:hover {
+      border-color: var(--accent);
+      background: rgba(74,222,128,.08);
+    }
+
+    /* ── Main AQI card ── */
+    #aqi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .4s;
+    }
+
+    #aqi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--current-color, var(--muted));
+      transition: background .4s;
+    }
+
+    .aqi-location {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+    }
+
+    .aqi-number-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 4px;
+    }
+
+    .aqi-number {
+      font-family: var(--font-head);
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--current-color, var(--muted));
+      transition: color .4s;
+    }
+
+    .aqi-label-col { display: flex; flex-direction: column; gap: 4px; }
+
+    .aqi-status {
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--current-color, var(--muted));
+      transition: color .4s;
+    }
+
+    .aqi-unit { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── Alert banner ── */
+    #alert-banner {
+      display: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 1.25rem;
+      border-left: 3px solid var(--current-color, var(--muted));
+      background: rgba(255,255,255,.04);
+    }
+
+    #alert-banner.visible { display: block; }
+
+    .alert-title {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--current-color, var(--text));
+      margin-bottom: 6px;
+    }
+
+    .alert-tips { list-style: none; }
+
+    .alert-tips li {
+      font-size: 0.73rem;
+      color: var(--muted);
+      padding: 3px 0;
+      display: flex;
+      gap: 8px;
+    }
+
+    .alert-tips li::before {
+      content: '→';
+      color: var(--current-color, var(--muted));
+      flex-shrink: 0;
+    }
+
+    /* ── Pollutant grid ── */
+    .pollutants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+
+    .pollutant-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .pollutant-name {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 6px;
+    }
+
+    .pollutant-value {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .pollutant-unit {
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+
+    .pollutant-bar-bg {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .pollutant-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width .6s ease;
+    }
+
+    /* ── Station info ── */
+    #station-info {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    #station-info strong { color: var(--text); }
+
+    /* ── AQI scale legend ── */
+    .scale {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .scale-seg {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Loading / error states ── */
+    #status-msg {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      display: none;
+    }
+
+    #status-msg.visible { display: block; }
+
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Threshold controls ── */
+    #threshold-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .threshold-title {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 12px;
+    }
+
+    .threshold-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .threshold-row label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    .threshold-row input[type=range] {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .threshold-val {
+      font-size: 0.72rem;
+      color: var(--text);
+      width: 52px;
+      text-align: right;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 2rem;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .aqi-number { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div>
+      <div class="logo">Air<span>Watch</span></div>
+      <div class="last-updated" id="last-updated">—</div>
+    </div>
+  </header>
+
+  <!-- Search / locate -->
+  <div class="search-row">
+    <input type="text" id="city-input" placeholder="City name (e.g. Sofia, Varna…)" onkeydown="if(event.key==='Enter')searchCity()" />
+    <button class="btn-search" onclick="searchCity()">Search</button>
+    <button class="btn-loc" onclick="useGPS()" title="Use my location">&#9655; GPS</button>
+  </div>
+
+  <!-- Status / loading -->
+  <div id="status-msg"></div>
+
+  <!-- Push notifications opt-in -->
+  <div id="push-bar" style="display:none; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.85rem 1.25rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+    <span style="font-size:.72rem; color:var(--muted); flex:1">Get notified when AQI crosses your threshold — even with the tab closed.</span>
+    <button id="push-btn" onclick="enablePush()" style="background:var(--accent); color:#0c0e10; border:none; border-radius:6px; padding:6px 14px; font-family:var(--font-mono); font-size:.72rem; font-weight:500; cursor:pointer; white-space:nowrap;">Enable alerts</button>
+  </div>
+
+  <!-- Main AQI card -->
+  <div id="aqi-card" style="display:none">
+    <div class="aqi-location" id="aqi-location">—</div>
+    <div class="aqi-number-row">
+      <div class="aqi-number" id="aqi-number">—</div>
+      <div class="aqi-label-col">
+        <div class="aqi-status" id="aqi-status">—</div>
+        <div class="aqi-unit">US AQI · WAQI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert banner -->
+  <div id="alert-banner">
+    <div class="alert-title" id="alert-title"></div>
+    <ul class="alert-tips" id="alert-tips"></ul>
+  </div>
+
+  <!-- Pollutant cards -->
+  <div class="pollutants-grid" id="pollutants-grid"></div>
+
+  <!-- Station info -->
+  <div id="station-info" style="display:none">
+    Nearest station: <strong id="station-name">—</strong> &nbsp;|&nbsp;
+    Distance: <strong id="station-dist">—</strong>
+  </div>
+
+  <!-- AQI scale -->
+  <div id="scale-section" style="display:none">
+    <div class="scale">
+      <div class="scale-seg" style="background:var(--good)"></div>
+      <div class="scale-seg" style="background:var(--moderate)"></div>
+      <div class="scale-seg" style="background:var(--usg)"></div>
+      <div class="scale-seg" style="background:var(--unhealthy)"></div>
+      <div class="scale-seg" style="background:var(--vunhealthy)"></div>
+      <div class="scale-seg" style="background:var(--hazardous)"></div>
+    </div>
+    <div class="scale-labels">
+      <span>Good (0)</span>
+      <span>Moderate (51)</span>
+      <span>USG (101)</span>
+      <span>Unhealthy (151)</span>
+      <span>Very (201)</span>
+      <span>Hazardous (301)</span>
+    </div>
+  </div>
+
+  <!-- Threshold controls -->
+  <div id="threshold-section" style="display:none">
+    <div class="threshold-title">Alert thresholds</div>
+
+    <div class="threshold-row">
+      <label>AQI alert</label>
+      <input type="range" id="th-aqi" min="0" max="300" value="100"
+             oninput="document.getElementById('th-aqi-val').textContent=this.value;saveThresholds()">
+      <span class="threshold-val"><span id="th-aqi-val">100</span> AQI</span>
+    </div>
+
+    <div class="threshold-row">
+      <label>PM2.5</label>
+      <input type="range" id="th-pm25" min="0" max="150" value="35"
+             oninput="document.getElementById('th-pm25-val').textContent=this.value;saveThresholds()">
+      <span class="threshold-val"><span id="th-pm25-val">35</span> µg/m³</span>
+    </div>
+
+    <div class="threshold-row">
+      <label>PM10</label>
+      <input type="range" id="th-pm10" min="0" max="300" value="50"
+             oninput="document.getElementById('th-pm10-val').textContent=this.value;saveThresholds()">
+      <span class="threshold-val"><span id="th-pm10-val">50</span> µg/m³</span>
+    </div>
+  </div>
+
+  <footer>
+    Data from <a href="https://waqi.info" target="_blank">World Air Quality Index</a> · <a href="https://openaq.org" target="_blank">OpenAQ</a> · Not medical advice.
+  </footer>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// Config & state
+// Fetches go to /api/aqi (Netlify function).
+// The WAQI token lives in Netlify env vars — users never see it.
+// ─────────────────────────────────────────────
+const API_BASE = '/api/aqi';
+
+let currentLat = null, currentLon = null;
+
+// ─────────────────────────────────────────────
+// Threshold management
+// ─────────────────────────────────────────────
+function saveThresholds() {
+  localStorage.setItem('aw_th', JSON.stringify({
+    aqi:  +document.getElementById('th-aqi').value,
+    pm25: +document.getElementById('th-pm25').value,
+    pm10: +document.getElementById('th-pm10').value,
+  }));
+}
+
+function loadThresholds() {
+  const saved = JSON.parse(localStorage.getItem('aw_th') || '{}');
+  if (saved.aqi  !== undefined) { document.getElementById('th-aqi').value  = saved.aqi;  document.getElementById('th-aqi-val').textContent  = saved.aqi;  }
+  if (saved.pm25 !== undefined) { document.getElementById('th-pm25').value = saved.pm25; document.getElementById('th-pm25-val').textContent = saved.pm25; }
+  if (saved.pm10 !== undefined) { document.getElementById('th-pm10').value = saved.pm10; document.getElementById('th-pm10-val').textContent = saved.pm10; }
+}
+
+function getThresholds() {
+  return {
+    aqi:  +document.getElementById('th-aqi').value,
+    pm25: +document.getElementById('th-pm25').value,
+    pm10: +document.getElementById('th-pm10').value,
+  };
+}
+
+// ─────────────────────────────────────────────
+// Status helpers
+// ─────────────────────────────────────────────
+function showStatus(msg, loading = true) {
+  const el = document.getElementById('status-msg');
+  if (!msg) { el.classList.remove('visible'); return; }
+  el.innerHTML = loading ? `<span class="spinner"></span>${msg}` : msg;
+  el.classList.add('visible');
+}
+
+function hideData() {
+  document.getElementById('aqi-card').style.display = 'none';
+  document.getElementById('alert-banner').classList.remove('visible');
+  document.getElementById('pollutants-grid').innerHTML = '';
+  document.getElementById('station-info').style.display = 'none';
+  document.getElementById('scale-section').style.display = 'none';
+  document.getElementById('threshold-section').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
+// WAQI fetch — by geo coordinates
+// ─────────────────────────────────────────────
+async function fetchByGeo(lat, lon) {
+  showStatus('Finding nearest monitoring station…');
+  hideData();
+  try {
+    const res = await fetch(`${API_BASE}?lat=${lat}&lon=${lon}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    handleWaqiResponse(json);
+  } catch(e) {
+    showStatus(`❌ Could not fetch data. Check your connection and try again.`, false);
+  }
+}
+
+// ─────────────────────────────────────────────
+// Fetch — by city name (via Netlify proxy)
+// ─────────────────────────────────────────────
+async function fetchByCity(city) {
+  showStatus(`Searching for "${city}"…`);
+  hideData();
+  try {
+    const res = await fetch(`${API_BASE}?city=${encodeURIComponent(city)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    handleWaqiResponse(json);
+  } catch(e) {
+    showStatus(`❌ Could not fetch data. Check your connection and try again.`, false);
+  }
+}
+
+// ─────────────────────────────────────────────
+// Parse & validate WAQI response
+// ─────────────────────────────────────────────
+function handleWaqiResponse(json) {
+  if (json.status === 'error') {
+    if (json.data === 'Unknown station') {
+      showStatus('❌ City not found. Try a different spelling or a nearby larger city.', false);
+    } else {
+      showStatus(`❌ Could not load data. Try again later.`, false);
+    }
+    return;
+  }
+  if (json.status !== 'ok' || !json.data) {
+    showStatus('❌ No data returned. Try a different city.', false);
+    return;
+  }
+  showStatus('', false);
+  renderWaqiData(json.data);
+  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+}
+
+// ─────────────────────────────────────────────
+// Render WAQI data
+// ─────────────────────────────────────────────
+function renderWaqiData(data) {
+  const aqi = data.aqi;
+  const stationName = data.city?.name || 'Unknown station';
+
+  // ── Determine AQI category
+  let category;
+  if      (aqi <= 50)  category = { label: 'Good',                    color: '--good',       tips: [] };
+  else if (aqi <= 100) category = { label: 'Moderate',                color: '--moderate',   tips: ['Unusually sensitive people should consider reducing prolonged outdoor exertion.'] };
+  else if (aqi <= 150) category = { label: 'Unhealthy for sensitive',  color: '--usg',        tips: ['People with respiratory issues: limit prolonged outdoor exertion.', 'Keep windows closed during peak traffic hours.'] };
+  else if (aqi <= 200) category = { label: 'Unhealthy',               color: '--unhealthy',  tips: ['Everyone: limit prolonged outdoor exertion.', 'Close windows and use air purifier if available.', 'Wear N95/FFP2 mask outdoors.', 'Asthmatics: keep inhaler handy.'] };
+  else if (aqi <= 300) category = { label: 'Very unhealthy',          color: '--vunhealthy', tips: ['Everyone: avoid outdoor exertion.', 'Keep all windows and doors shut.', 'Run air purifier on high.', 'Asthmatics and COPD patients: stay indoors.', 'Seek medical advice if symptoms worsen.'] };
+  else                 category = { label: 'Hazardous',               color: '--hazardous',  tips: ['Stay indoors. Do not exercise outside.', 'Seal gaps around windows/doors.', 'N95/FFP2 mask if you MUST go out.', 'Contact emergency services if breathing difficulty occurs.'] };
+
+  const colorVal = `var(${category.color})`;
+  document.documentElement.style.setProperty('--current-color', colorVal);
+
+  // ── AQI card
+  const card = document.getElementById('aqi-card');
+  card.style.display = 'block';
+  card.style.borderColor = colorVal;
+  document.getElementById('aqi-location').textContent = stationName;
+  document.getElementById('aqi-number').textContent = aqi;
+  document.getElementById('aqi-status').textContent = category.label;
+
+  // ── Alert banner
+  const thresholds = getThresholds();
+  const iaqi = data.iaqi || {};
+  const pm25val = iaqi.pm25?.v;
+  const pm10val = iaqi.pm10?.v;
+
+  const shouldAlert = aqi >= thresholds.aqi
+    || (pm25val !== undefined && pm25val >= thresholds.pm25)
+    || (pm10val !== undefined && pm10val >= thresholds.pm10);
+
+  const alertBanner = document.getElementById('alert-banner');
+  if (shouldAlert && category.tips.length) {
+    document.getElementById('alert-title').textContent = `⚠ Air quality alert — ${category.label}`;
+    document.getElementById('alert-tips').innerHTML = category.tips.map(t => `<li>${t}</li>`).join('');
+    alertBanner.style.setProperty('--current-color', colorVal);
+    alertBanner.classList.add('visible');
+  } else {
+    alertBanner.classList.remove('visible');
+  }
+
+  // ── Pollutant cards
+  const POLLUTANT_META = {
+    pm25: { label: 'PM2.5',  unit: 'µg/m³', max: 150, barColor: 'var(--unhealthy)' },
+    pm10: { label: 'PM10',   unit: 'µg/m³', max: 300, barColor: 'var(--moderate)'  },
+    no2:  { label: 'NO₂',   unit: 'ppb',   max: 200, barColor: 'var(--usg)'       },
+    o3:   { label: 'O₃',    unit: 'ppb',   max: 240, barColor: 'var(--good)'      },
+    so2:  { label: 'SO₂',   unit: 'ppb',   max: 350, barColor: 'var(--moderate)'  },
+    co:   { label: 'CO',    unit: 'ppm',   max: 30,  barColor: 'var(--muted)'     },
+  };
+
+  const grid = document.getElementById('pollutants-grid');
+  grid.innerHTML = '';
+  Object.entries(POLLUTANT_META).forEach(([key, meta]) => {
+    const entry = iaqi[key];
+    if (!entry) return;
+    const val = entry.v;
+    const pct = Math.min(100, Math.round((val / meta.max) * 100));
+    const displayVal = val < 10 ? val.toFixed(2) : Math.round(val);
+    grid.innerHTML += `
+      <div class="pollutant-card">
+        <div class="pollutant-name">${meta.label}</div>
+        <div class="pollutant-value">${displayVal}<span class="pollutant-unit">${meta.unit}</span></div>
+        <div class="pollutant-bar-bg">
+          <div class="pollutant-bar" style="width:${pct}%;background:${meta.barColor}"></div>
+        </div>
+      </div>`;
+  });
+
+  // ── Station info
+  document.getElementById('station-name').textContent = stationName;
+  document.getElementById('station-dist').textContent = data.city?.url
+    ? `see map` : 'nearest';
+  document.getElementById('station-info').style.display = 'block';
+
+  // ── Scale + thresholds
+  document.getElementById('scale-section').style.display = 'block';
+  document.getElementById('threshold-section').style.display = 'block';
+
+  // ── Fire local notification if tab is hidden and AQI is over threshold
+  maybeNotify(aqi, stationName, category);
+}
+
+// ─────────────────────────────────────────────
+// GPS
+// ─────────────────────────────────────────────
+function useGPS() {
+  if (!navigator.geolocation) { showStatus('GPS not supported in this browser.', false); return; }
+  showStatus('Getting your location…');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      currentLat = pos.coords.latitude;
+      currentLon = pos.coords.longitude;
+      fetchByGeo(currentLat, currentLon);
+    },
+    err => showStatus('Location access denied. Try typing a city name instead.', false),
+    { timeout: 8000 }
+  );
+}
+
+// ─────────────────────────────────────────────
+// City search
+// ─────────────────────────────────────────────
+function searchCity() {
+  const city = document.getElementById('city-input').value.trim();
+  if (!city) return;
+  fetchByCity(city);
+}
+
+// ─────────────────────────────────────────────
+// PWA — Service Worker registration
+// ─────────────────────────────────────────────
+let swRegistration = null;
+
+async function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    swRegistration = await navigator.serviceWorker.register('/sw.js');
+    console.log('[AirWatch] SW registered');
+    // Show push opt-in bar if not already granted
+    if (Notification.permission !== 'granted') {
+      document.getElementById('push-bar').style.display = 'flex';
+    } else {
+      updatePushBtn(true);
+    }
+  } catch(e) {
+    console.warn('[AirWatch] SW registration failed:', e);
+  }
+}
+
+// ─────────────────────────────────────────────
+// Push notifications
+// ─────────────────────────────────────────────
+
+// VAPID public key — for Phase 3 when you add a backend.
+// For now, push uses the Notifications API directly (local alerts).
+// Replace this with your real VAPID key when you set up the server.
+const VAPID_PUBLIC_KEY = 'LOCAL_ONLY'; // placeholder
+
+async function enablePush() {
+  if (!('Notification' in window)) {
+    alert('Your browser does not support notifications.');
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    document.getElementById('push-btn').textContent = 'Blocked — allow in browser settings';
+    document.getElementById('push-btn').style.background = 'var(--unhealthy)';
+    return;
+  }
+
+  updatePushBtn(true);
+  localStorage.setItem('aw_push', '1');
+
+  // Show a test notification immediately so user sees it works
+  new Notification('AirWatch alerts enabled ✓', {
+    body: 'You\'ll be notified when air quality crosses your threshold.',
+    icon: '/icon-192.png',
+    tag: 'airwatch-setup',
+  });
+}
+
+function updatePushBtn(enabled) {
+  const btn = document.getElementById('push-btn');
+  const bar = document.getElementById('push-bar');
+  if (enabled) {
+    btn.textContent = '✓ Alerts on';
+    btn.style.background = 'transparent';
+    btn.style.border = '1px solid var(--accent)';
+    btn.style.color = 'var(--accent)';
+    btn.onclick = null;
+    btn.style.cursor = 'default';
+  }
+  bar.style.display = 'flex';
+}
+
+// ─────────────────────────────────────────────
+// Local alert trigger (fires when AQI crosses threshold)
+// Called from renderWaqiData — no server needed for Phase 2
+// ─────────────────────────────────────────────
+function maybeNotify(aqi, stationName, category) {
+  const thresholds = getThresholds();
+  if (Notification.permission !== 'granted') return;
+  if (aqi < thresholds.aqi) return;
+  if (document.visibilityState === 'visible') return; // only notify if tab is hidden
+
+  new Notification(`⚠ AQI ${aqi} — ${category.label}`, {
+    body: `${stationName}\n${category.tips[0] || 'Take precautions.'}`,
+    icon: '/icon-192.png',
+    tag: 'airwatch-alert',
+  });
+}
+
+// ─────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────
+(function init() {
+  loadThresholds();
+  showStatus('Search a city or tap GPS to get started.', false);
+
+  // Register service worker
+  window.addEventListener('load', registerSW);
+
+  // Show install prompt when browser fires it
+  let deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+
+    // Add an install button to the header
+    const header = document.querySelector('header');
+    const installBtn = document.createElement('button');
+    installBtn.textContent = '⬇ Install app';
+    installBtn.style.cssText = 'background:transparent;border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;cursor:pointer;margin-top:4px;';
+    installBtn.onclick = async () => {
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') installBtn.remove();
+      deferredInstallPrompt = null;
+    };
+    header.appendChild(installBtn);
+  });
+})();
+</script>
+</body>
+</html>
