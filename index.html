@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -428,17 +429,323 @@
       .aqi-number { font-size: 4rem; }
       .search-row input { border-radius: 50px; }
     }
+
+    /* ── Auth modal overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(45,36,23,.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.75rem 1.75rem;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .modal-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .3rem;
+    }
+
+    .modal-sub {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(224,120,67,.12);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 12px;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: .5rem;
+      transition: opacity .2s;
+    }
+
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-google {
+      width: 100%;
+      background: var(--surface);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 11px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: .6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s;
+    }
+
+    .btn-google:hover { background: var(--surface-2); }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 1rem 0;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .auth-switch {
+      text-align: center;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: 1.25rem;
+    }
+
+    .auth-switch a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .auth-error {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: .78rem;
+      color: #991b1b;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .auth-error.visible { display: block; }
+
+    .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0 0 .5rem .5rem;
+      line-height: 1;
+    }
+
+    /* ── Header auth button ── */
+    .btn-auth {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      font-weight: 500;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      white-space: nowrap;
+    }
+
+    .btn-auth:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* ── User pill shown when logged in ── */
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      border: 1.5px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .user-email {
+      font-size: .75rem;
+      color: var(--muted);
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-signout {
+      background: none;
+      border: none;
+      font-size: .72rem;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    /* ── Saved locations bar ── */
+    #locations-bar {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 1.1rem;
+    }
+
+    #locations-bar.visible { display: flex; }
+
+    .loc-chip {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 5px 12px;
+      font-size: .78rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loc-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+    .loc-chip-del {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .loc-chip-del:hover { color: var(--unhealthy); }
+
+    .btn-save-loc {
+      background: none;
+      border: 1.5px dashed var(--border);
+      border-radius: 50px;
+      padding: 5px 12px;
+      font-size: .78rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+
+    .btn-save-loc:hover { border-color: var(--accent); color: var(--accent); }
+
   </style>
 </head>
 <body>
 <div class="app">
+
+  <!-- Auth modal -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAuthModal()">&#10005;</button>
+      <div class="modal-title" id="auth-title">Welcome back</div>
+      <div class="modal-sub" id="auth-sub">Sign in to save locations and track symptoms across devices.</div>
+      <div class="auth-error" id="auth-error"></div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="you@example.com" />
+      </div>
+      <div class="field" id="auth-pw-field">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitAuth()" />
+      </div>
+
+      <button class="btn-primary" id="auth-submit-btn" onclick="submitAuth()">Sign in</button>
+
+      <div class="auth-divider">or</div>
+
+      <button class="btn-google" onclick="signInWithGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-switch" id="auth-switch">
+        No account? <a onclick="toggleAuthMode()">Sign up free</a>
+      </div>
+    </div>
+  </div>
 
   <header>
     <div>
       <div class="logo">Air<span>Watch</span></div>
       <div class="last-updated" id="last-updated">—</div>
     </div>
+    <div id="auth-header">
+      <button class="btn-auth" onclick="openAuthModal()">Sign in</button>
+    </div>
   </header>
+
+  <!-- Saved locations bar (shown when logged in) -->
+  <div id="locations-bar"></div>
 
   <!-- Search / locate -->
   <div class="search-row">
@@ -537,30 +844,250 @@
 
 <script>
 // ─────────────────────────────────────────────
-// Config & state
-// Fetches go to /api/aqi (Netlify function).
-// The WAQI token lives in Netlify env vars — users never see it.
+// Config
 // ─────────────────────────────────────────────
 const API_BASE = '/api/aqi';
 
+// Replace these with your actual Supabase project values
+const SUPABASE_URL  = 'PASTE_YOUR_SUPABASE_URL_HERE';
+const SUPABASE_ANON = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
 let currentLat = null, currentLon = null;
+let currentUser = null;
+let currentCity = null; // last searched city name
 
 // ─────────────────────────────────────────────
-// Threshold management
+// Auth — state
 // ─────────────────────────────────────────────
-function saveThresholds() {
-  localStorage.setItem('aw_th', JSON.stringify({
+sb.auth.onAuthStateChange(async (event, session) => {
+  currentUser = session?.user ?? null;
+  renderAuthHeader();
+  if (currentUser) {
+    await loadThresholdsFromDB();
+    await loadSavedLocations();
+  } else {
+    loadThresholdsFromLocal();
+    document.getElementById('locations-bar').classList.remove('visible');
+  }
+});
+
+// ─────────────────────────────────────────────
+// Auth — modal
+// ─────────────────────────────────────────────
+let authMode = 'signin'; // 'signin' | 'signup'
+
+function openAuthModal() {
+  authMode = 'signin';
+  syncModalText();
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  hideAuthError();
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(() => document.getElementById('auth-email').focus(), 100);
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  syncModalText();
+  hideAuthError();
+}
+
+function syncModalText() {
+  const isSignin = authMode === 'signin';
+  document.getElementById('auth-title').textContent   = isSignin ? 'Welcome back' : 'Create account';
+  document.getElementById('auth-sub').textContent     = isSignin
+    ? 'Sign in to save locations and track symptoms across devices.'
+    : 'Free account — save locations, log symptoms, sync across devices.';
+  document.getElementById('auth-submit-btn').textContent = isSignin ? 'Sign in' : 'Sign up free';
+  document.getElementById('auth-switch').innerHTML    = isSignin
+    ? 'No account? <a onclick="toggleAuthMode()">Sign up free</a>'
+    : 'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function hideAuthError() {
+  document.getElementById('auth-error').classList.remove('visible');
+}
+
+async function submitAuth() {
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn      = document.getElementById('auth-submit-btn');
+
+  if (!email || !password) { showAuthError('Please fill in both fields.'); return; }
+  if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+  hideAuthError();
+
+  const { error } = authMode === 'signin'
+    ? await sb.auth.signInWithPassword({ email, password })
+    : await sb.auth.signUp({ email, password });
+
+  btn.disabled = false;
+  syncModalText();
+
+  if (error) {
+    showAuthError(error.message);
+  } else {
+    if (authMode === 'signup') {
+      showAuthError('Check your email to confirm your account, then sign in.');
+      document.getElementById('auth-error').style.background = '#f0fdf4';
+      document.getElementById('auth-error').style.borderColor = '#86efac';
+      document.getElementById('auth-error').style.color = '#166534';
+    } else {
+      closeAuthModal();
+    }
+  }
+}
+
+async function signInWithGoogle() {
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  });
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+}
+
+// ─────────────────────────────────────────────
+// Auth — header rendering
+// ─────────────────────────────────────────────
+function renderAuthHeader() {
+  const el = document.getElementById('auth-header');
+  if (!currentUser) {
+    el.innerHTML = '<button class="btn-auth" onclick="openAuthModal()">Sign in</button>';
+    return;
+  }
+  const initials = (currentUser.email || 'U')[0].toUpperCase();
+  const shortEmail = currentUser.email?.split('@')[0] ?? '';
+  el.innerHTML = `
+    <div class="user-pill">
+      <div class="user-avatar">${initials}</div>
+      <span class="user-email">${shortEmail}</span>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// Saved locations
+// ─────────────────────────────────────────────
+async function loadSavedLocations() {
+  if (!currentUser) return;
+  const { data, error } = await sb.from('saved_locations')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: true });
+
+  if (error) { console.error('locations load error', error); return; }
+  renderLocationsBar(data || []);
+}
+
+function renderLocationsBar(locations) {
+  const bar = document.getElementById('locations-bar');
+  bar.innerHTML = '';
+
+  locations.forEach(loc => {
+    const chip = document.createElement('div');
+    chip.className = 'loc-chip';
+    chip.innerHTML = `<span onclick="fetchByCity('${loc.city_name}')">${loc.display_name}</span>
+      <span class="loc-chip-del" onclick="deleteLocation('${loc.id}')" title="Remove">&#10005;</span>`;
+    bar.appendChild(chip);
+  });
+
+  // Add "save current" button if we have a current city and under limit
+  if (currentCity) {
+    const alreadySaved = locations.some(l => l.city_name.toLowerCase() === currentCity.toLowerCase());
+    const atLimit = !isPremium() && locations.length >= 2;
+    if (!alreadySaved && !atLimit) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-save-loc';
+      btn.textContent = '+ Save ' + currentCity;
+      btn.onclick = () => saveCurrentLocation(locations);
+      bar.appendChild(btn);
+    }
+  }
+
+  bar.classList.toggle('visible', locations.length > 0 || !!currentCity);
+}
+
+async function saveCurrentLocation(existingLocations) {
+  if (!currentUser || !currentCity) return;
+  if (!isPremium() && existingLocations.length >= 2) {
+    alert('Free accounts can save up to 2 locations. Upgrade to premium for unlimited.');
+    return;
+  }
+  const { error } = await sb.from('saved_locations').insert({
+    user_id:      currentUser.id,
+    city_name:    currentCity,
+    display_name: currentCity,
+  });
+  if (!error) await loadSavedLocations();
+}
+
+async function deleteLocation(id) {
+  await sb.from('saved_locations').delete().eq('id', id);
+  await loadSavedLocations();
+}
+
+function isPremium() {
+  // Checked against profiles.plan — extended in Phase 4
+  return false;
+}
+
+// ─────────────────────────────────────────────
+// Thresholds — cloud sync when logged in,
+// localStorage fallback when logged out
+// ─────────────────────────────────────────────
+async function saveThresholds() {
+  const vals = {
     aqi:  +document.getElementById('th-aqi').value,
     pm25: +document.getElementById('th-pm25').value,
     pm10: +document.getElementById('th-pm10').value,
-  }));
+  };
+  localStorage.setItem('aw_th', JSON.stringify(vals));
+
+  if (currentUser) {
+    await sb.from('user_thresholds').upsert({
+      user_id:    currentUser.id,
+      ...vals,
+      updated_at: new Date().toISOString(),
+    });
+  }
 }
 
-function loadThresholds() {
+async function loadThresholdsFromDB() {
+  if (!currentUser) return;
+  const { data } = await sb.from('user_thresholds')
+    .select('aqi, pm25, pm10')
+    .eq('user_id', currentUser.id)
+    .single();
+  if (data) applyThresholds(data);
+}
+
+function loadThresholdsFromLocal() {
   const saved = JSON.parse(localStorage.getItem('aw_th') || '{}');
-  if (saved.aqi  !== undefined) { document.getElementById('th-aqi').value  = saved.aqi;  document.getElementById('th-aqi-val').textContent  = saved.aqi;  }
-  if (saved.pm25 !== undefined) { document.getElementById('th-pm25').value = saved.pm25; document.getElementById('th-pm25-val').textContent = saved.pm25; }
-  if (saved.pm10 !== undefined) { document.getElementById('th-pm10').value = saved.pm10; document.getElementById('th-pm10-val').textContent = saved.pm10; }
+  if (Object.keys(saved).length) applyThresholds(saved);
+}
+
+function applyThresholds(t) {
+  if (t.aqi  !== undefined) { document.getElementById('th-aqi').value  = t.aqi;  document.getElementById('th-aqi-val').textContent  = t.aqi;  }
+  if (t.pm25 !== undefined) { document.getElementById('th-pm25').value = t.pm25; document.getElementById('th-pm25-val').textContent = t.pm25; }
+  if (t.pm10 !== undefined) { document.getElementById('th-pm10').value = t.pm10; document.getElementById('th-pm10-val').textContent = t.pm10; }
 }
 
 function getThresholds() {
@@ -591,7 +1118,7 @@ function hideData() {
 }
 
 // ─────────────────────────────────────────────
-// WAQI fetch — by geo coordinates
+// WAQI fetch — by geo
 // ─────────────────────────────────────────────
 async function fetchByGeo(lat, lon) {
   showStatus('Finding nearest monitoring station…');
@@ -602,14 +1129,15 @@ async function fetchByGeo(lat, lon) {
     const json = await res.json();
     handleWaqiResponse(json);
   } catch(e) {
-    showStatus(`❌ Could not fetch data. Check your connection and try again.`, false);
+    showStatus('❌ Could not fetch data. Check your connection and try again.', false);
   }
 }
 
 // ─────────────────────────────────────────────
-// Fetch — by city name (via Netlify proxy)
+// WAQI fetch — by city
 // ─────────────────────────────────────────────
 async function fetchByCity(city) {
+  currentCity = city;
   showStatus(`Searching for "${city}"…`);
   hideData();
   try {
@@ -618,19 +1146,19 @@ async function fetchByCity(city) {
     const json = await res.json();
     handleWaqiResponse(json);
   } catch(e) {
-    showStatus(`❌ Could not fetch data. Check your connection and try again.`, false);
+    showStatus('❌ Could not fetch data. Check your connection and try again.', false);
   }
 }
 
 // ─────────────────────────────────────────────
-// Parse & validate WAQI response
+// WAQI response handler
 // ─────────────────────────────────────────────
 function handleWaqiResponse(json) {
   if (json.status === 'error') {
     if (json.data === 'Unknown station') {
       showStatus('❌ City not found. Try a different spelling or a nearby larger city.', false);
     } else {
-      showStatus(`❌ Could not load data. Try again later.`, false);
+      showStatus('❌ Could not load data. Try again later.', false);
     }
     return;
   }
@@ -644,60 +1172,58 @@ function handleWaqiResponse(json) {
 }
 
 // ─────────────────────────────────────────────
-// Render WAQI data
+// Render
 // ─────────────────────────────────────────────
 function renderWaqiData(data) {
-  const aqi = data.aqi;
+  const aqi         = data.aqi;
   const stationName = data.city?.name || 'Unknown station';
 
-  // ── Determine AQI category
+  // Update currentCity from station name if set by GPS
+  if (!currentCity) currentCity = stationName.split(',')[0].trim();
+
   let category;
-  if      (aqi <= 50)  category = { label: 'Good',                    color: '--good',       tips: [] };
-  else if (aqi <= 100) category = { label: 'Moderate',                color: '--moderate',   tips: ['Unusually sensitive people should consider reducing prolonged outdoor exertion.'] };
-  else if (aqi <= 150) category = { label: 'Unhealthy for sensitive',  color: '--usg',        tips: ['People with respiratory issues: limit prolonged outdoor exertion.', 'Keep windows closed during peak traffic hours.'] };
-  else if (aqi <= 200) category = { label: 'Unhealthy',               color: '--unhealthy',  tips: ['Everyone: limit prolonged outdoor exertion.', 'Close windows and use air purifier if available.', 'Wear N95/FFP2 mask outdoors.', 'Asthmatics: keep inhaler handy.'] };
-  else if (aqi <= 300) category = { label: 'Very unhealthy',          color: '--vunhealthy', tips: ['Everyone: avoid outdoor exertion.', 'Keep all windows and doors shut.', 'Run air purifier on high.', 'Asthmatics and COPD patients: stay indoors.', 'Seek medical advice if symptoms worsen.'] };
-  else                 category = { label: 'Hazardous',               color: '--hazardous',  tips: ['Stay indoors. Do not exercise outside.', 'Seal gaps around windows/doors.', 'N95/FFP2 mask if you MUST go out.', 'Contact emergency services if breathing difficulty occurs.'] };
+  if      (aqi <= 50)  category = { label: 'Good',                   color: '--good',       tips: [] };
+  else if (aqi <= 100) category = { label: 'Moderate',               color: '--moderate',   tips: ['Unusually sensitive people should consider reducing prolonged outdoor exertion.'] };
+  else if (aqi <= 150) category = { label: 'Unhealthy for sensitive', color: '--usg',        tips: ['People with respiratory issues: limit prolonged outdoor exertion.', 'Keep windows closed during peak traffic hours.'] };
+  else if (aqi <= 200) category = { label: 'Unhealthy',              color: '--unhealthy',  tips: ['Everyone: limit prolonged outdoor exertion.', 'Close windows and use air purifier if available.', 'Wear N95/FFP2 mask outdoors.', 'Asthmatics: keep inhaler handy.'] };
+  else if (aqi <= 300) category = { label: 'Very unhealthy',         color: '--vunhealthy', tips: ['Everyone: avoid outdoor exertion.', 'Keep all windows and doors shut.', 'Run air purifier on high.', 'Asthmatics and COPD patients: stay indoors.', 'Seek medical advice if symptoms worsen.'] };
+  else                 category = { label: 'Hazardous',              color: '--hazardous',  tips: ['Stay indoors. Do not exercise outside.', 'Seal gaps around windows/doors.', 'N95/FFP2 mask if you MUST go out.', 'Contact emergency services if breathing difficulty occurs.'] };
 
   const colorVal = `var(${category.color})`;
   document.documentElement.style.setProperty('--current-color', colorVal);
 
-  // ── AQI card
   const card = document.getElementById('aqi-card');
   card.style.display = 'block';
   card.style.borderColor = colorVal;
   document.getElementById('aqi-location').textContent = stationName;
-  document.getElementById('aqi-number').textContent = aqi;
-  document.getElementById('aqi-status').textContent = category.label;
+  document.getElementById('aqi-number').textContent   = aqi;
+  document.getElementById('aqi-status').textContent   = category.label;
 
-  // ── Alert banner
   const thresholds = getThresholds();
-  const iaqi = data.iaqi || {};
-  const pm25val = iaqi.pm25?.v;
-  const pm10val = iaqi.pm10?.v;
-
+  const iaqi       = data.iaqi || {};
+  const pm25val    = iaqi.pm25?.v;
+  const pm10val    = iaqi.pm10?.v;
   const shouldAlert = aqi >= thresholds.aqi
     || (pm25val !== undefined && pm25val >= thresholds.pm25)
     || (pm10val !== undefined && pm10val >= thresholds.pm10);
 
   const alertBanner = document.getElementById('alert-banner');
   if (shouldAlert && category.tips.length) {
-    document.getElementById('alert-title').textContent = `⚠ Air quality alert — ${category.label}`;
-    document.getElementById('alert-tips').innerHTML = category.tips.map(t => `<li>${t}</li>`).join('');
+    document.getElementById('alert-title').textContent   = `⚠ Air quality alert — ${category.label}`;
+    document.getElementById('alert-tips').innerHTML      = category.tips.map(t => `<li>${t}</li>`).join('');
     alertBanner.style.setProperty('--current-color', colorVal);
     alertBanner.classList.add('visible');
   } else {
     alertBanner.classList.remove('visible');
   }
 
-  // ── Pollutant cards
   const POLLUTANT_META = {
-    pm25: { label: 'PM2.5',  unit: 'µg/m³', max: 150, barColor: 'var(--unhealthy)' },
-    pm10: { label: 'PM10',   unit: 'µg/m³', max: 300, barColor: 'var(--moderate)'  },
-    no2:  { label: 'NO₂',   unit: 'ppb',   max: 200, barColor: 'var(--usg)'       },
-    o3:   { label: 'O₃',    unit: 'ppb',   max: 240, barColor: 'var(--good)'      },
-    so2:  { label: 'SO₂',   unit: 'ppb',   max: 350, barColor: 'var(--moderate)'  },
-    co:   { label: 'CO',    unit: 'ppm',   max: 30,  barColor: 'var(--muted)'     },
+    pm25: { label: 'PM2.5', unit: 'µg/m³', max: 150, barColor: 'var(--unhealthy)' },
+    pm10: { label: 'PM10',  unit: 'µg/m³', max: 300, barColor: 'var(--moderate)'  },
+    no2:  { label: 'NO₂',  unit: 'ppb',   max: 200, barColor: 'var(--usg)'       },
+    o3:   { label: 'O₃',   unit: 'ppb',   max: 240, barColor: 'var(--good)'      },
+    so2:  { label: 'SO₂',  unit: 'ppb',   max: 350, barColor: 'var(--moderate)'  },
+    co:   { label: 'CO',   unit: 'ppm',   max: 30,  barColor: 'var(--muted)'     },
   };
 
   const grid = document.getElementById('pollutants-grid');
@@ -705,8 +1231,8 @@ function renderWaqiData(data) {
   Object.entries(POLLUTANT_META).forEach(([key, meta]) => {
     const entry = iaqi[key];
     if (!entry) return;
-    const val = entry.v;
-    const pct = Math.min(100, Math.round((val / meta.max) * 100));
+    const val        = entry.v;
+    const pct        = Math.min(100, Math.round((val / meta.max) * 100));
     const displayVal = val < 10 ? val.toFixed(2) : Math.round(val);
     grid.innerHTML += `
       <div class="pollutant-card">
@@ -718,18 +1244,16 @@ function renderWaqiData(data) {
       </div>`;
   });
 
-  // ── Station info
-  document.getElementById('station-name').textContent = stationName;
-  document.getElementById('station-dist').textContent = data.city?.url
-    ? `see map` : 'nearest';
+  document.getElementById('station-name').textContent  = stationName;
+  document.getElementById('station-dist').textContent  = data.city?.url ? 'see map' : 'nearest';
   document.getElementById('station-info').style.display = 'block';
-
-  // ── Scale + thresholds
   document.getElementById('scale-section').style.display = 'block';
   document.getElementById('threshold-section').style.display = 'block';
 
-  // ── Fire local notification if tab is hidden and AQI is over threshold
   maybeNotify(aqi, stationName, category);
+
+  // Refresh saved locations bar (shows "save current" button)
+  if (currentUser) loadSavedLocations();
 }
 
 // ─────────────────────────────────────────────
@@ -742,9 +1266,10 @@ function useGPS() {
     pos => {
       currentLat = pos.coords.latitude;
       currentLon = pos.coords.longitude;
+      currentCity = null;
       fetchByGeo(currentLat, currentLon);
     },
-    err => showStatus('Location access denied. Try typing a city name instead.', false),
+    () => showStatus('Location access denied. Try typing a city name instead.', false),
     { timeout: 8000 }
   );
 }
@@ -759,7 +1284,7 @@ function searchCity() {
 }
 
 // ─────────────────────────────────────────────
-// PWA — Service Worker registration
+// PWA — Service Worker
 // ─────────────────────────────────────────────
 let swRegistration = null;
 
@@ -767,8 +1292,6 @@ async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
     swRegistration = await navigator.serviceWorker.register('/sw.js');
-    console.log('[AirWatch] SW registered');
-    // Show push opt-in bar if not already granted
     if (Notification.permission !== 'granted') {
       document.getElementById('push-bar').style.display = 'flex';
     } else {
@@ -782,31 +1305,20 @@ async function registerSW() {
 // ─────────────────────────────────────────────
 // Push notifications
 // ─────────────────────────────────────────────
-
-// VAPID public key — for Phase 3 when you add a backend.
-// For now, push uses the Notifications API directly (local alerts).
-// Replace this with your real VAPID key when you set up the server.
-const VAPID_PUBLIC_KEY = 'LOCAL_ONLY'; // placeholder
+const VAPID_PUBLIC_KEY = 'LOCAL_ONLY';
 
 async function enablePush() {
-  if (!('Notification' in window)) {
-    alert('Your browser does not support notifications.');
-    return;
-  }
-
+  if (!('Notification' in window)) { alert('Your browser does not support notifications.'); return; }
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
     document.getElementById('push-btn').textContent = 'Blocked — allow in browser settings';
     document.getElementById('push-btn').style.background = '#c45c3a';
     return;
   }
-
   updatePushBtn(true);
   localStorage.setItem('aw_push', '1');
-
-  // Show a test notification immediately so user sees it works
   new Notification('AirWatch alerts enabled ✓', {
-    body: 'You\'ll be notified when air quality crosses your threshold.',
+    body: "You'll be notified when air quality crosses your threshold.",
     icon: '/icon-192.png',
     tag: 'airwatch-setup',
   });
@@ -817,25 +1329,20 @@ function updatePushBtn(enabled) {
   const bar = document.getElementById('push-bar');
   if (enabled) {
     btn.textContent = '✓ Alerts on';
-    btn.style.background = 'transparent';
+    btn.style.background = 'var(--accent-soft)';
     btn.style.border = '1.5px solid var(--accent)';
-    btn.style.color = 'var(--accent)'; btn.style.background = 'var(--accent-soft)';
+    btn.style.color = 'var(--accent)';
     btn.onclick = null;
     btn.style.cursor = 'default';
   }
   bar.style.display = 'flex';
 }
 
-// ─────────────────────────────────────────────
-// Local alert trigger (fires when AQI crosses threshold)
-// Called from renderWaqiData — no server needed for Phase 2
-// ─────────────────────────────────────────────
 function maybeNotify(aqi, stationName, category) {
   const thresholds = getThresholds();
   if (Notification.permission !== 'granted') return;
   if (aqi < thresholds.aqi) return;
-  if (document.visibilityState === 'visible') return; // only notify if tab is hidden
-
+  if (document.visibilityState === 'visible') return;
   new Notification(`⚠ AQI ${aqi} — ${category.label}`, {
     body: `${stationName}\n${category.tips[0] || 'Take precautions.'}`,
     icon: '/icon-192.png',
@@ -847,19 +1354,15 @@ function maybeNotify(aqi, stationName, category) {
 // Init
 // ─────────────────────────────────────────────
 (function init() {
-  loadThresholds();
+  loadThresholdsFromLocal();
   showStatus('Search a city or tap GPS to get started.', false);
-
-  // Register service worker
   window.addEventListener('load', registerSW);
 
-  // Show install prompt when browser fires it
+  // Install prompt
   let deferredInstallPrompt = null;
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredInstallPrompt = e;
-
-    // Add an install button to the header
     const header = document.querySelector('header');
     const installBtn = document.createElement('button');
     installBtn.textContent = '⬇ Install app';
