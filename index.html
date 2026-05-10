@@ -1992,7 +1992,7 @@ function maybeNotify(aqi, stationName, category) {
   if (aqi < thresholds.aqi) return;
   if (document.visibilityState === "visible") return;
   new Notification(`⚠ AQI ${aqi} — ${category.label}`, {
-    body: `${stationName}\n${category.tips[0] || 'Take precautions."}`,
+    body: `${stationName}\n${category.tips[0] || "Take precautions."}`,
     icon: "/icon-192.png",
     tag: "airwatch-alert",
   });
