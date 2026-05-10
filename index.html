@@ -2093,26 +2093,43 @@ async function saveDiaryEntry() {
   saveBtn.disabled = true;
   saveBtn.textContent = 'Saving…';
 
-  const entry = {
-    user_id:     currentUser.id,
-    city_name:   currentCity || 'Unknown',
-    aqi_at_time: lastAqi ?? null,
-    notes:       document.getElementById('diary-notes').value.trim(),
-    ...diaryState,
-  };
+  try {
+    // Ensure profile row exists — may be missing if account predates the trigger
+    const { error: profileErr } = await sb.from('profiles').upsert({
+      id:    currentUser.id,
+      email: currentUser.email,
+    }, { onConflict: 'id', ignoreDuplicates: true });
 
-  const { error } = await sb.from('diary_entries').insert(entry);
+    if (profileErr) {
+      console.warn('Profile upsert warning:', profileErr.message);
+    }
 
-  saveBtn.disabled = false;
-  saveBtn.textContent = 'Save entry';
+    const entry = {
+      user_id:     currentUser.id,
+      city_name:   currentCity || 'Unknown',
+      aqi_at_time: lastAqi ?? null,
+      notes:       document.getElementById('diary-notes').value.trim(),
+      ...diaryState,
+    };
 
-  if (error) {
-    alert('Could not save entry: ' + error.message);
-    return;
+    const { error } = await sb.from('diary_entries').insert(entry);
+
+    if (error) {
+      console.error('Diary insert error:', error);
+      alert('Could not save entry: ' + error.message + '\n\nCode: ' + error.code);
+      return;
+    }
+
+    closeDiaryForm();
+    await loadDiaryEntries();
+
+  } catch(e) {
+    console.error('saveDiaryEntry exception:', e);
+    alert('Unexpected error: ' + e.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save entry';
   }
-
-  closeDiaryForm();
-  await loadDiaryEntries();
 }
 
 // ── Load entries from Supabase
@@ -2500,9 +2517,9 @@ function renderDigestToggle() {
   track.classList.toggle('on', digestEnabled);
   label.textContent = digestEnabled ? 'On' : 'Off';
   if (digestEnabled) {
-    status.textContent = "You'll receive a morning AQI briefing at 7 AM for your saved locations.";
+    status.textContent = 'You'll receive a morning AQI briefing at 7 AM for your saved locations.';
   } else {
-    status.textContent = "Enable to receive a morning briefing with today's AQI and personalised advice.";
+    status.textContent = 'Enable to receive a morning briefing with today's AQI and personalised advice.';
   }
 }
 
