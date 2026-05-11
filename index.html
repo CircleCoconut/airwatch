@@ -414,496 +414,127 @@
     }
 
 
-    /* ── Diary section ── */
-    #diary-section {
-      margin-bottom: 1.5rem;
-    }
+
+    /* ════ DIARY ════════════════════════════════ */
+    #diary-section { margin-bottom: 2rem; }
 
     .diary-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 1rem;
     }
-
     .diary-title {
-      font-family: var(--font-head);
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
+      font-family: var(--font-head); font-size: 1.1rem;
+      font-weight: 600; color: var(--text);
     }
-
     .btn-log {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: 7px 16px;
-      font-family: var(--font-body);
-      font-size: .8rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity .2s;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 50px; padding: 7px 16px;
+      font-family: var(--font-body); font-size: .8rem;
+      font-weight: 500; cursor: pointer;
     }
-
     .btn-log:hover { opacity: .88; }
-
-    /* Log entry form */
-    .diary-form {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.2rem 1.25rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-
-    .diary-form.open { display: block; }
-
-    .diary-form-title {
-      font-size: .78rem;
-      font-weight: 600;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      margin-bottom: 1rem;
-    }
-
-    .symptom-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 1rem;
-    }
-
-    .symptom-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .symptom-label {
-      font-size: .75rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .severity-btns {
-      display: flex;
-      gap: 4px;
-    }
-
-    .sev-btn {
-      flex: 1;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      padding: 5px 0;
-      font-size: .7rem;
-      font-weight: 500;
-      cursor: pointer;
-      background: var(--bg);
-      color: var(--muted);
-      transition: all .15s;
-      text-align: center;
-    }
-
-    .sev-btn.active-0 { background: var(--surface-2); color: var(--text); border-color: var(--muted); }
-    .sev-btn.active-1 { background: #fef9ec; color: #b45309; border-color: #d4a843; }
-    .sev-btn.active-2 { background: #fff3ee; color: #c2440e; border-color: var(--usg); }
-    .sev-btn.active-3 { background: #fef2f2; color: #b91c1c; border-color: var(--unhealthy); }
-
-    .diary-notes {
-      width: 100%;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      font-family: var(--font-body);
-      font-size: .84rem;
-      color: var(--text);
-      resize: vertical;
-      min-height: 60px;
-      outline: none;
-      margin-bottom: 1rem;
-      box-sizing: border-box;
-    }
-
-    .diary-notes:focus { border-color: var(--accent); }
-    .diary-notes::placeholder { color: var(--muted); }
-
-    .diary-form-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .btn-cancel {
-      background: none;
-      border: 1.5px solid var(--border);
-      border-radius: 50px;
-      padding: 7px 16px;
-      font-family: var(--font-body);
-      font-size: .8rem;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .btn-cancel:hover { border-color: var(--muted); }
-
-    /* Chart */
-    .diary-chart-wrap {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.25rem 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .chart-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: .6rem;
-    }
-
-    .chart-label {
-      font-size: .72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      font-weight: 500;
-    }
-
-    .chart-legend {
-      display: flex;
-      gap: 12px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: .68rem;
-      color: var(--muted);
-    }
-
-    .legend-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    #diary-canvas {
-      width: 100%;
-      height: 160px;
-      display: block;
-    }
-
-    /* Past entries list */
-    .diary-entries-label {
-      font-size: .72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      font-weight: 500;
-      margin-bottom: .6rem;
-    }
-
-    .diary-entry-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: .9rem 1rem;
-      margin-bottom: 8px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .entry-aqi-badge {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-family: var(--font-head);
-    }
-
-    .entry-aqi-num {
-      font-size: .95rem;
-      font-weight: 600;
-      line-height: 1;
-    }
-
-    .entry-aqi-label {
-      font-size: .5rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-top: 2px;
-    }
-
-    .entry-body { flex: 1; min-width: 0; }
-
-    .entry-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 5px;
-    }
-
-    .entry-date {
-      font-size: .75rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .entry-city {
-      font-size: .7rem;
-      color: var(--muted);
-    }
-
-    .entry-symptoms {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    .symptom-tag {
-      font-size: .68rem;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: 500;
-    }
-
-    .symptom-tag.sev-1 { background: #fef9ec; color: #b45309; }
-    .symptom-tag.sev-2 { background: #fff3ee; color: #c2440e; }
-    .symptom-tag.sev-3 { background: #fef2f2; color: #b91c1c; }
-
-    .entry-notes {
-      font-size: .73rem;
-      color: var(--muted);
-      margin-top: 4px;
-      font-style: italic;
-    }
-
-    .entry-delete {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: .8rem;
-      padding: 2px;
-      opacity: .5;
-      flex-shrink: 0;
-    }
-
-    .entry-delete:hover { opacity: 1; color: var(--unhealthy); }
-
-    .diary-empty {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--muted);
-      font-size: .82rem;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      line-height: 1.6;
-    }
+    .btn-log:disabled { opacity: .5; cursor: not-allowed; }
 
     .diary-signin-prompt {
-      background: var(--accent-soft);
-      border: 1.5px solid #f5d5be;
-      border-radius: var(--radius-md);
-      padding: 1rem 1.25rem;
-      font-size: .82rem;
-      color: #6b4c2a;
-      line-height: 1.6;
+      background: var(--accent-soft); border: 1.5px solid #f5d5be;
+      border-radius: var(--radius-md); padding: 1rem 1.25rem;
+      font-size: .82rem; color: #6b4c2a; line-height: 1.6;
+    }
+    .diary-signin-prompt a { color: var(--accent); cursor: pointer; font-weight: 500; }
+
+    /* form */
+    .diary-form {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-md); padding: 1.2rem 1.25rem;
+      margin-bottom: 1rem; display: none;
+    }
+    .diary-form.open { display: block; }
+    .diary-form-title {
+      font-size: .78rem; font-weight: 600; color: var(--text);
+      text-transform: uppercase; letter-spacing: .07em; margin-bottom: 1rem;
+    }
+    .symptom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .symptom-row { display: flex; flex-direction: column; gap: 6px; }
+    .symptom-label { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .severity-btns { display: flex; gap: 4px; }
+    .sev-btn {
+      flex: 1; border: 1.5px solid var(--border); border-radius: 6px;
+      padding: 5px 0; font-size: .7rem; font-weight: 500; cursor: pointer;
+      background: var(--bg); color: var(--muted); text-align: center;
+    }
+    .sev-btn.sel-0 { background: var(--surface-2); color: var(--text); border-color: var(--muted); }
+    .sev-btn.sel-1 { background: #fef9ec; color: #b45309; border-color: #d4a843; }
+    .sev-btn.sel-2 { background: #fff3ee; color: #c2440e; border-color: var(--usg); }
+    .sev-btn.sel-3 { background: #fef2f2; color: #b91c1c; border-color: var(--unhealthy); }
+    .diary-notes {
+      width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 12px;
+      font-family: var(--font-body); font-size: .84rem; color: var(--text);
+      resize: vertical; min-height: 60px; outline: none;
+      margin-bottom: 1rem; box-sizing: border-box;
+    }
+    .diary-notes:focus { border-color: var(--accent); }
+    .diary-notes::placeholder { color: var(--muted); }
+    .diary-form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-cancel {
+      background: none; border: 1.5px solid var(--border); border-radius: 50px;
+      padding: 7px 16px; font-family: var(--font-body); font-size: .8rem;
+      color: var(--muted); cursor: pointer;
     }
 
-    .diary-signin-prompt a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-      cursor: pointer;
+    /* chart */
+    .diary-chart-wrap {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-md); padding: 1.1rem 1.25rem 1rem;
+      margin-bottom: 1rem; display: none;
     }
+    .diary-chart-wrap.visible { display: block; }
+    .chart-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .6rem; }
+    .chart-lbl { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; font-weight: 500; }
+    .chart-legend { display: flex; gap: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: .68rem; color: var(--muted); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    #diary-canvas { width: 100%; height: 160px; display: block; }
 
-
-    /* ── Forecast ── */
-    #forecast-section {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.25rem;
-      margin-bottom: 1rem;
-      display: none;
+    /* entries list */
+    .diary-entries-lbl {
+      font-size: .72rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .07em; font-weight: 500; margin-bottom: .6rem;
     }
-    #forecast-section.visible { display: block; }
-    .forecast-header {
-      font-size: .72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      font-weight: 500;
-      margin-bottom: .9rem;
+    .diary-entry-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-md); padding: .9rem 1rem;
+      margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start;
     }
-    .forecast-scroll {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
-    .forecast-scroll::-webkit-scrollbar { display: none; }
-    .forecast-slot {
-      flex-shrink: 0;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 10px;
-      text-align: center;
-      min-width: 58px;
-      transition: border-color .2s;
-    }
-    .forecast-slot.now {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-    .fc-time { font-size: .65rem; color: var(--muted); margin-bottom: 5px; }
-    .fc-aqi  {
+    .entry-aqi-badge {
+      width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       font-family: var(--font-head);
-      font-size: 1.15rem;
-      font-weight: 600;
-      line-height: 1;
-      margin-bottom: 3px;
     }
-    .fc-label { font-size: .58rem; color: var(--muted); line-height: 1.2; }
-
-    /* ── Health profile ── */
-    #profile-section {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.25rem;
-      margin-bottom: 1rem;
-      display: none;
+    .entry-aqi-num  { font-size: 1rem; font-weight: 600; line-height: 1; }
+    .entry-aqi-lbl  { font-size: .5rem; text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+    .entry-body     { flex: 1; min-width: 0; }
+    .entry-meta     { display: flex; gap: 8px; align-items: center; margin-bottom: 5px; }
+    .entry-date     { font-size: .75rem; font-weight: 500; color: var(--text); }
+    .entry-city     { font-size: .7rem; color: var(--muted); }
+    .entry-symptoms { display: flex; flex-wrap: wrap; gap: 4px; }
+    .stag { font-size: .68rem; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+    .stag-0 { background: #f0fdf4; color: #166534; }
+    .stag-1 { background: #fef9ec; color: #b45309; }
+    .stag-2 { background: #fff3ee; color: #c2440e; }
+    .stag-3 { background: #fef2f2; color: #b91c1c; }
+    .entry-notes { font-size: .73rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+    .entry-del {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: .8rem; opacity: .5; flex-shrink: 0;
     }
-    #profile-section.visible { display: block; }
-    .profile-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: .9rem;
+    .entry-del:hover { opacity: 1; color: var(--unhealthy); }
+    .diary-empty {
+      text-align: center; padding: 1.5rem; color: var(--muted);
+      font-size: .82rem; background: var(--surface);
+      border: 1.5px solid var(--border); border-radius: var(--radius-md); line-height: 1.6;
     }
-    .profile-title {
-      font-size: .72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      font-weight: 500;
-    }
-    .profile-saved-badge {
-      font-size: .68rem;
-      color: var(--good);
-      display: none;
-    }
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 1rem;
-    }
-    .profile-chip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 9px 12px;
-      cursor: pointer;
-      transition: all .15s;
-      user-select: none;
-    }
-    .profile-chip.selected {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-    }
-    .profile-chip-icon { font-size: 1rem; flex-shrink: 0; }
-    .profile-chip-label { font-size: .78rem; color: var(--text); font-weight: 500; }
-    .profile-chip.selected .profile-chip-label { color: var(--accent); }
-    .profile-chip-sub { font-size: .65rem; color: var(--muted); }
-    .profile-note {
-      font-size: .73rem;
-      color: var(--muted);
-      line-height: 1.6;
-      padding: .6rem .8rem;
-      background: var(--surface-2);
-      border-radius: 8px;
-    }
-
-    /* ── Email digest ── */
-    #digest-section {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.25rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    #digest-section.visible { display: block; }
-    .digest-header {
-      font-size: .72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      font-weight: 500;
-      margin-bottom: .75rem;
-    }
-    .digest-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .digest-desc {
-      font-size: .8rem;
-      color: var(--text);
-      line-height: 1.5;
-      flex: 1;
-    }
-    .digest-desc span { color: var(--muted); font-size: .73rem; display: block; margin-top: 2px; }
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .toggle-track {
-      position: relative;
-      width: 36px; height: 20px;
-      background: var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background .2s;
-      flex-shrink: 0;
-    }
-    .toggle-track.on { background: var(--accent); }
-    .toggle-thumb {
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 16px; height: 16px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform .2s;
-      pointer-events: none;
-    }
-    .toggle-track.on .toggle-thumb { transform: translateX(16px); }
-    .toggle-label { font-size: .78rem; color: var(--muted); }
+    /* ═══════════════════════════════════════════ */
 
     /* ── Footer ── */
     footer {
@@ -1389,79 +1020,78 @@
     </div>
   </div>
 
-  <!-- ── Symptom Diary ── -->
+
+  <!-- ════ SYMPTOM DIARY ════ -->
   <div id="diary-section">
+
     <div class="diary-header">
       <div class="diary-title">Symptom diary</div>
-      <button class="btn-log" id="diary-log-btn" onclick="openDiaryForm()">+ Log today</button>
+      <button class="btn-log" id="diary-log-btn" onclick="diaryOpenForm()" style="display:none">+ Log today</button>
     </div>
 
-    <!-- Sign-in prompt shown when logged out -->
-    <div id="diary-signin-prompt" class="diary-signin-prompt" style="display:none">
+    <div id="diary-signin-prompt" class="diary-signin-prompt">
       <a onclick="openAuthModal()">Sign in</a> to log symptoms and track how air quality affects you over time.
     </div>
 
-    <!-- Log form -->
     <div class="diary-form" id="diary-form">
       <div class="diary-form-title">How are you feeling?</div>
       <div class="symptom-grid">
         <div class="symptom-row">
           <span class="symptom-label">Cough</span>
-          <div class="severity-btns" data-symptom="cough">
-            <button class="sev-btn active-0" data-val="0" onclick="setSeverity(this,'cough',0)">None</button>
-            <button class="sev-btn" data-val="1" onclick="setSeverity(this,'cough',1)">Mild</button>
-            <button class="sev-btn" data-val="2" onclick="setSeverity(this,'cough',2)">Mod</button>
-            <button class="sev-btn" data-val="3" onclick="setSeverity(this,'cough',3)">Bad</button>
+          <div class="severity-btns">
+            <button class="sev-btn sel-0" onclick="diarySev(this,event,'cough',0)">None</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'cough',1)">Mild</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'cough',2)">Mod</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'cough',3)">Bad</button>
           </div>
         </div>
         <div class="symptom-row">
           <span class="symptom-label">Wheeze</span>
-          <div class="severity-btns" data-symptom="wheeze">
-            <button class="sev-btn active-0" data-val="0" onclick="setSeverity(this,'wheeze',0)">None</button>
-            <button class="sev-btn" data-val="1" onclick="setSeverity(this,'wheeze',1)">Mild</button>
-            <button class="sev-btn" data-val="2" onclick="setSeverity(this,'wheeze',2)">Mod</button>
-            <button class="sev-btn" data-val="3" onclick="setSeverity(this,'wheeze',3)">Bad</button>
+          <div class="severity-btns">
+            <button class="sev-btn sel-0" onclick="diarySev(this,event,'wheeze',0)">None</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'wheeze',1)">Mild</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'wheeze',2)">Mod</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'wheeze',3)">Bad</button>
           </div>
         </div>
         <div class="symptom-row">
           <span class="symptom-label">Shortness of breath</span>
-          <div class="severity-btns" data-symptom="shortness">
-            <button class="sev-btn active-0" data-val="0" onclick="setSeverity(this,'shortness',0)">None</button>
-            <button class="sev-btn" data-val="1" onclick="setSeverity(this,'shortness',1)">Mild</button>
-            <button class="sev-btn" data-val="2" onclick="setSeverity(this,'shortness',2)">Mod</button>
-            <button class="sev-btn" data-val="3" onclick="setSeverity(this,'shortness',3)">Bad</button>
+          <div class="severity-btns">
+            <button class="sev-btn sel-0" onclick="diarySev(this,event,'shortness',0)">None</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'shortness',1)">Mild</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'shortness',2)">Mod</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'shortness',3)">Bad</button>
           </div>
         </div>
         <div class="symptom-row">
           <span class="symptom-label">Chest tightness</span>
-          <div class="severity-btns" data-symptom="chest_tight">
-            <button class="sev-btn active-0" data-val="0" onclick="setSeverity(this,'chest_tight',0)">None</button>
-            <button class="sev-btn" data-val="1" onclick="setSeverity(this,'chest_tight',1)">Mild</button>
-            <button class="sev-btn" data-val="2" onclick="setSeverity(this,'chest_tight',2)">Mod</button>
-            <button class="sev-btn" data-val="3" onclick="setSeverity(this,'chest_tight',3)">Bad</button>
+          <div class="severity-btns">
+            <button class="sev-btn sel-0" onclick="diarySev(this,event,'chest_tight',0)">None</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'chest_tight',1)">Mild</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'chest_tight',2)">Mod</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'chest_tight',3)">Bad</button>
           </div>
         </div>
         <div class="symptom-row">
           <span class="symptom-label">Fatigue</span>
-          <div class="severity-btns" data-symptom="fatigue">
-            <button class="sev-btn active-0" data-val="0" onclick="setSeverity(this,'fatigue',0)">None</button>
-            <button class="sev-btn" data-val="1" onclick="setSeverity(this,'fatigue',1)">Mild</button>
-            <button class="sev-btn" data-val="2" onclick="setSeverity(this,'fatigue',2)">Mod</button>
-            <button class="sev-btn" data-val="3" onclick="setSeverity(this,'fatigue',3)">Bad</button>
+          <div class="severity-btns">
+            <button class="sev-btn sel-0" onclick="diarySev(this,event,'fatigue',0)">None</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'fatigue',1)">Mild</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'fatigue',2)">Mod</button>
+            <button class="sev-btn"       onclick="diarySev(this,event,'fatigue',3)">Bad</button>
           </div>
         </div>
       </div>
-      <textarea class="diary-notes" id="diary-notes" placeholder="Any notes… (optional)"></textarea>
+      <textarea id="diary-notes" class="diary-notes" placeholder="Any notes… (optional)"></textarea>
       <div class="diary-form-actions">
-        <button class="btn-cancel" onclick="closeDiaryForm()">Cancel</button>
-        <button class="btn-log" id="diary-save-btn" onclick="saveDiaryEntry()">Save entry</button>
+        <button class="btn-cancel" onclick="diaryCloseForm()">Cancel</button>
+        <button class="btn-log" id="diary-save-btn" onclick="diarySave()">Save entry</button>
       </div>
     </div>
 
-    <!-- Chart (shown when entries exist) -->
-    <div class="diary-chart-wrap" id="diary-chart-wrap" style="display:none">
+    <div class="diary-chart-wrap" id="diary-chart-wrap">
       <div class="chart-top">
-        <span class="chart-label">Last 30 days</span>
+        <span class="chart-lbl">Last 30 days</span>
         <div class="chart-legend">
           <span class="legend-item"><span class="legend-dot" style="background:#e07843"></span>AQI</span>
           <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Symptoms</span>
@@ -1470,9 +1100,9 @@
       <canvas id="diary-canvas"></canvas>
     </div>
 
-    <!-- Past entries -->
-    <div id="diary-entries-list"></div>
+    <div id="diary-list"></div>
   </div>
+  <!-- ════════════════════════ -->
 
   <footer>
     Data from <a href="https://waqi.info" target="_blank">World Air Quality Index</a> · <a href="https://openaq.org" target="_blank">OpenAQ</a> · Not medical advice.
@@ -1514,7 +1144,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
     document.getElementById("profile-section").classList.remove("visible");
     document.getElementById("digest-section").classList.remove("visible");
   }
-  refreshDiarySection();
+  diaryRefresh();
 });
 
 // ─────────────────────────────────────────────
@@ -2025,308 +1655,6 @@ function maybeNotify(aqi, stationName, category) {
   });
 })();
 
-// ─────────────────────────────────────────────
-// Symptom Diary
-// ─────────────────────────────────────────────
-
-const SYMPTOMS = ["cough","wheeze","shortness","chest_tight","fatigue"];
-const SYMPTOM_LABELS = {
-  cough: "Cough", wheeze: "Wheeze", shortness: "Shortness of breath",
-  chest_tight: "Chest tightness", fatigue: "Fatigue"
-};
-const SEV_LABELS = ["", "Mild", "Moderate", "Severe"];
-
-// Current form state
-let diaryState = { cough:0, wheeze:0, shortness:0, chest_tight:0, fatigue:0 };
-let diaryChart = null;
-
-// ── Show/hide diary section based on auth
-function refreshDiarySection() {
-  const signInPrompt = document.getElementById("diary-signin-prompt");
-  const logBtn       = document.getElementById("diary-log-btn");
-
-  if (!currentUser) {
-    signInPrompt.style.display = "block";
-    logBtn.style.display       = "none";
-    document.getElementById("diary-chart-wrap").style.display = "none";
-    document.getElementById("diary-entries-list").innerHTML   = "";
-    return;
-  }
-
-  signInPrompt.style.display = "none";
-  logBtn.style.display       = "inline-block";
-  loadDiaryEntries();
-}
-
-// ── Open / close log form
-function openDiaryForm() {
-  if (!currentUser) { openAuthModal(); return; }
-  // Reset state
-  diaryState = { cough:0, wheeze:0, shortness:0, chest_tight:0, fatigue:0 };
-  SYMPTOMS.forEach(s => {
-    const group = document.querySelector(`.severity-btns[data-symptom="${s}"]`);
-    group.querySelectorAll(".sev-btn").forEach(b => b.className = "sev-btn");
-    group.querySelector("[data-val=\"0\"]").classList.add("active-0");
-  });
-  document.getElementById("diary-notes").value = "";
-  document.getElementById("diary-form").classList.add("open");
-  document.getElementById("diary-form").scrollIntoView({ behavior:"smooth", block:"nearest" });
-}
-
-function closeDiaryForm() {
-  document.getElementById("diary-form").classList.remove("open");
-}
-
-// ── Severity button toggle
-function setSeverity(btn, symptom, val) {
-  diaryState[symptom] = val;
-  const group = btn.closest(".severity-btns");
-  group.querySelectorAll(".sev-btn").forEach(b => b.className = "sev-btn");
-  btn.classList.add("active-" + val);
-}
-
-// ── Save entry to Supabase
-async function saveDiaryEntry() {
-  if (!currentUser) return;
-
-  const saveBtn = document.getElementById("diary-save-btn");
-  saveBtn.disabled = true;
-  saveBtn.textContent = "Saving…";
-
-  try {
-    // Ensure profile row exists — may be missing if account predates the trigger
-    // Ensure profile row exists before inserting diary entry
-    await sb.from("profiles").upsert({
-      id:    currentUser.id,
-      email: currentUser.email,
-    }, { onConflict: "id" });
-
-    const entry = {
-      user_id:     currentUser.id,
-      city_name:   currentCity || "Unknown",
-      aqi_at_time: lastAqi ?? null,
-      notes:       document.getElementById("diary-notes").value.trim(),
-      ...diaryState,
-    };
-
-    const { error } = await sb.from("diary_entries").insert(entry);
-
-    if (error) {
-      console.error("Diary insert error:", error);
-      alert("Could not save entry: " + error.message + "\n\nCode: " + error.code);
-      return;
-    }
-
-    closeDiaryForm();
-    await loadDiaryEntries();
-
-  } catch(e) {
-    console.error("saveDiaryEntry exception:", e);
-    alert("Unexpected error: " + e.message);
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = "Save entry";
-  }
-}
-
-// ── Load entries from Supabase
-async function loadDiaryEntries() {
-  if (!currentUser) return;
-
-  const since = new Date();
-  since.setDate(since.getDate() - 30);
-
-  const { data, error } = await sb
-    .from("diary_entries")
-    .select("*")
-    .eq("user_id", currentUser.id)
-    .gte("logged_at", since.toISOString())
-    .order("logged_at", { ascending: false });
-
-  if (error) { console.error("diary load error", error); return; }
-  renderDiaryEntries(data || []);
-  renderDiaryChart(data || []);
-}
-
-// ── Render entries list
-function renderDiaryEntries(entries) {
-  const list = document.getElementById("diary-entries-list");
-
-  if (!entries.length) {
-    list.innerHTML = "<div class=\"diary-empty\">No entries yet.<br>Tap <strong>+ Log today</strong> after checking your AQI to start tracking.</div>";
-    return;
-  }
-
-  list.innerHTML = "<div class=\"diary-entries-label\">Recent entries</div>" +
-    entries.map(e => {
-      const date   = new Date(e.logged_at);
-      const dateStr = date.toLocaleDateString("en-GB", { day:"numeric", month:"short" });
-      const timeStr = date.toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" });
-
-      const aqiColor = e.aqi_at_time <= 50  ? "#5a9e6f"
-                     : e.aqi_at_time <= 100 ? "#d4a843"
-                     : e.aqi_at_time <= 150 ? "#e07843"
-                     : e.aqi_at_time <= 200 ? "#c45c3a"
-                     : "#8b5cf6";
-
-      const aqiBg = e.aqi_at_time <= 50  ? "#f0fdf4"
-                  : e.aqi_at_time <= 100 ? "#fefce8"
-                  : e.aqi_at_time <= 150 ? "#fff7ed"
-                  : e.aqi_at_time <= 200 ? "#fff1ee"
-                  : "#f5f3ff";
-
-      const aqiDisplay = e.aqi_at_time ?? "—";
-
-      const symptomTags = SYMPTOMS
-        .filter(s => e[s] > 0)
-        .map(s => `<span class="symptom-tag sev-${e[s]}">${SYMPTOM_LABELS[s]} · ${SEV_LABELS[e[s]]}</span>`)
-        .join("");
-
-      const allClear = SYMPTOMS.every(s => !e[s]);
-
-      return `
-        <div class="diary-entry-card">
-          <div class="entry-aqi-badge" style="background:${aqiBg};color:${aqiColor}">
-            <span class="entry-aqi-num">${aqiDisplay}</span>
-            <span class="entry-aqi-label">AQI</span>
-          </div>
-          <div class="entry-body">
-            <div class="entry-meta">
-              <span class="entry-date">${dateStr}, ${timeStr}</span>
-              <span class="entry-city">${e.city_name}</span>
-            </div>
-            <div class="entry-symptoms">
-              ${allClear
-                ? '<span class="symptom-tag sev-1" style="background:#f0fdf4;color:#166534">No symptoms</span>'
-                : symptomTags}
-            </div>
-            ${e.notes ? `<div class="entry-notes">"${e.notes}"</div>` : ''}
-          </div>
-          <button class="entry-delete" onclick="deleteDiaryEntry('${e.id}')" title="Delete">✕</button>
-        </div>`;
-    }).join("");
-}
-
-// ── Render 30-day chart
-function renderDiaryChart(entries) {
-  const wrap = document.getElementById("diary-chart-wrap");
-  if (!entries.length) { wrap.style.display = "none"; return; }
-  wrap.style.display = "block";
-
-  // Build daily buckets for last 30 days
-  const days = [];
-  const aqiByDay = {};
-  const symptomByDay = {};
-  const now = new Date();
-
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
-    days.push(key);
-    aqiByDay[key]     = null;
-    symptomByDay[key] = null;
-  }
-
-  entries.forEach(e => {
-    const key = e.logged_at.slice(0, 10);
-    if (!(key in aqiByDay)) return;
-    if (e.aqi_at_time !== null) aqiByDay[key] = e.aqi_at_time;
-    const severity = SYMPTOMS.reduce((sum, s) => sum + (e[s] || 0), 0);
-    symptomByDay[key] = Math.max(symptomByDay[key] ?? 0, severity);
-  });
-
-  const labels      = days.map(d => { const dt = new Date(d+"T12:00:00Z"); return dt.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); });
-  const aqiData     = days.map(d => aqiByDay[d]);
-  const symptomData = days.map(d => symptomByDay[d]);
-
-  const ctx = document.getElementById("diary-canvas").getContext("2d");
-  if (diaryChart) diaryChart.destroy();
-
-  diaryChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "AQI",
-          data: aqiData,
-          backgroundColor: "rgba(224,120,67,.25)",
-          borderColor:     "#e07843",
-          borderWidth: 1.5,
-          borderRadius: 3,
-          yAxisID: "y",
-          order: 2,
-        },
-        {
-          label: "Symptom severity",
-          data: symptomData,
-          type: "line",
-          borderColor: "#8b5cf6",
-          backgroundColor: "rgba(139,92,246,.12)",
-          borderWidth: 2,
-          pointRadius: 4,
-          pointBackgroundColor: "#8b5cf6",
-          tension: .3,
-          fill: true,
-          yAxisID: "y2",
-          order: 1,
-          spanGaps: false,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode:"index", intersect:false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              if (ctx.dataset.label === "AQI") return ` AQI: ${ctx.raw ?? '—'}`;
-              if (ctx.raw === null) return null;
-              const sevText = ["None","Low","Medium","High","Very high","Extreme"][Math.min(ctx.raw,5)];
-              return ` Symptoms: ${sevText} (${ctx.raw})`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: {
-            font: { size: 10, family: "'Inter', sans-serif" },
-            color: "#9c8873",
-            maxTicksLimit: 10,
-            maxRotation: 0,
-          },
-        },
-        y: {
-          position: "left",
-          grid: { color: "rgba(0,0,0,.05)" },
-          ticks: { font:{ size:10 }, color:"#9c8873", maxTicksLimit:5 },
-          title: { display:true, text:"AQI", font:{size:9}, color:"#e07843" },
-        },
-        y2: {
-          position: "right",
-          min: 0, max: 15,
-          grid: { drawOnChartArea: false },
-          ticks: { font:{size:10}, color:"#8b5cf6", maxTicksLimit:4,
-            callback: v => ["","Low","Med","High","Severe"][v] || "" },
-          title: { display:true, text:"Symptoms", font:{size:9}, color:"#8b5cf6" },
-        },
-      },
-    },
-  });
-}
-
-// ── Delete entry
-async function deleteDiaryEntry(id) {
-  if (!confirm("Delete this entry?")) return;
-  await sb.from("diary_entries").delete().eq("id", id);
-  await loadDiaryEntries();
-}
 
 
 // ─────────────────────────────────────────────
@@ -2529,6 +1857,277 @@ async function toggleDigest() {
   renderDigestToggle();
 }
 
+
+// ════ DIARY ════════════════════════════════════
+// Fresh rewrite — simple, no clever hacks
+// ═══════════════════════════════════════════════
+
+const DIARY_SYMPTOMS = ["cough","wheeze","shortness","chest_tight","fatigue"];
+const DIARY_LABELS   = { cough:"Cough", wheeze:"Wheeze", shortness:"Shortness of breath", chest_tight:"Chest tightness", fatigue:"Fatigue" };
+const DIARY_SEV      = ["","Mild","Moderate","Severe"];
+
+// Current form values — plain object, no proxy magic
+var dState = {};
+var dChart = null;
+
+function diaryResetState() {
+  dState = { cough:0, wheeze:0, shortness:0, chest_tight:0, fatigue:0 };
+}
+
+// Called from auth state change
+function diaryRefresh() {
+  var prompt = document.getElementById("diary-signin-prompt");
+  var logBtn = document.getElementById("diary-log-btn");
+  if (!currentUser) {
+    prompt.style.display = "block";
+    logBtn.style.display = "none";
+    document.getElementById("diary-chart-wrap").classList.remove("visible");
+    document.getElementById("diary-list").innerHTML = "";
+    return;
+  }
+  prompt.style.display = "none";
+  logBtn.style.display = "inline-block";
+  diaryLoad();
+}
+
+function diaryOpenForm() {
+  if (!currentUser) { openAuthModal(); return; }
+  diaryResetState();
+  // Reset all buttons to sel-0
+  document.querySelectorAll(".severity-btns").forEach(function(group) {
+    group.querySelectorAll(".sev-btn").forEach(function(b) { b.className = "sev-btn"; });
+    group.querySelectorAll(".sev-btn")[0].classList.add("sel-0");
+  });
+  document.getElementById("diary-notes").value = "";
+  document.getElementById("diary-form").classList.add("open");
+}
+
+function diaryCloseForm() {
+  document.getElementById("diary-form").classList.remove("open");
+}
+
+function diarySev(btn, e, symptom, val) {
+  e.preventDefault();
+  dState[symptom] = val;
+  var group = btn.parentElement;
+  group.querySelectorAll(".sev-btn").forEach(function(b) { b.className = "sev-btn"; });
+  btn.classList.add("sel-" + val);
+}
+
+async function diarySave() {
+  if (!currentUser) return;
+
+  var saveBtn = document.getElementById("diary-save-btn");
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving…";
+
+  try {
+    var entry = {
+      user_id:     currentUser.id,
+      city_name:   currentCity || "Unknown",
+      aqi_at_time: lastAqi,
+      notes:       document.getElementById("diary-notes").value.trim(),
+      cough:       dState.cough,
+      wheeze:      dState.wheeze,
+      shortness:   dState.shortness,
+      chest_tight: dState.chest_tight,
+      fatigue:     dState.fatigue
+    };
+
+    console.log("Diary save — user:", currentUser.id, "entry:", entry);
+
+    var result = await sb.from("diary_entries").insert(entry).select();
+
+    console.log("Diary insert result:", result);
+
+    if (result.error) {
+      alert("Save failed: " + result.error.message + " (code: " + result.error.code + ")");
+      return;
+    }
+
+    diaryCloseForm();
+    await diaryLoad();
+
+  } catch(ex) {
+    console.error("diarySave exception:", ex);
+    alert("Unexpected error: " + ex.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save entry";
+  }
+}
+
+async function diaryLoad() {
+  if (!currentUser) return;
+
+  var since = new Date();
+  since.setDate(since.getDate() - 30);
+
+  var result = await sb
+    .from("diary_entries")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .gte("logged_at", since.toISOString())
+    .order("logged_at", { ascending: false });
+
+  console.log("Diary load result:", result);
+
+  if (result.error) { console.error("Diary load error:", result.error); return; }
+  var entries = result.data || [];
+  diaryRenderList(entries);
+  diaryRenderChart(entries);
+}
+
+function diaryRenderList(entries) {
+  var list = document.getElementById("diary-list");
+
+  if (!entries.length) {
+    list.innerHTML = "<div class=\"diary-empty\">No entries yet — tap <strong>+ Log today</strong> to start tracking.</div>";
+    return;
+  }
+
+  var colors = {
+    aqi:  function(v) {
+      if (!v) return { bg:"#f5f5f4", fg:"#78716c" };
+      if (v<=50)  return { bg:"#f0fdf4", fg:"#166534" };
+      if (v<=100) return { bg:"#fefce8", fg:"#854d0e" };
+      if (v<=150) return { bg:"#fff7ed", fg:"#c2440e" };
+      if (v<=200) return { bg:"#fff1ee", fg:"#9f1239" };
+      return              { bg:"#f5f3ff", fg:"#5b21b6" };
+    }
+  };
+
+  list.innerHTML = "<div class=\"diary-entries-lbl\">Recent entries</div>" +
+    entries.map(function(e) {
+      var c    = colors.aqi(e.aqi_at_time);
+      var dt   = new Date(e.logged_at);
+      var date = dt.toLocaleDateString("en-GB", { day:"numeric", month:"short" });
+      var time = dt.toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" });
+      var tags = DIARY_SYMPTOMS
+        .filter(function(s) { return e[s] > 0; })
+        .map(function(s) {
+          return "<span class=\"stag stag-" + e[s] + "\">" + DIARY_LABELS[s] + " · " + DIARY_SEV[e[s]] + "</span>";
+        }).join("");
+      if (!tags) tags = "<span class=\"stag stag-0\">No symptoms</span>";
+
+      return "<div class=\"diary-entry-card\">" +
+        "<div class=\"entry-aqi-badge\" style=\"background:" + c.bg + ";color:" + c.fg + "\">" +
+          "<span class=\"entry-aqi-num\">" + (e.aqi_at_time || "—") + "</span>" +
+          "<span class=\"entry-aqi-lbl\">AQI</span>" +
+        "</div>" +
+        "<div class=\"entry-body\">" +
+          "<div class=\"entry-meta\">" +
+            "<span class=\"entry-date\">" + date + ", " + time + "</span>" +
+            "<span class=\"entry-city\">" + e.city_name + "</span>" +
+          "</div>" +
+          "<div class=\"entry-symptoms\">" + tags + "</div>" +
+          (e.notes ? "<div class=\"entry-notes\">\u201c" + e.notes + "\u201d</div>" : "") +
+        "</div>" +
+        "<button class=\"entry-del\" onclick=\"diaryDelete('" + e.id + "')\">\u2715</button>" +
+      "</div>";
+    }).join("");
+}
+
+function diaryRenderChart(entries) {
+  var wrap = document.getElementById("diary-chart-wrap");
+  if (!entries.length) { wrap.classList.remove("visible"); return; }
+  wrap.classList.add("visible");
+
+  // Build 30-day buckets
+  var now  = new Date();
+  var days = [];
+  var aqiMap = {}, sevMap = {};
+
+  for (var i = 29; i >= 0; i--) {
+    var d = new Date(now);
+    d.setDate(d.getDate() - i);
+    var key = d.toISOString().slice(0,10);
+    days.push(key);
+    aqiMap[key] = null;
+    sevMap[key] = null;
+  }
+
+  entries.forEach(function(e) {
+    var key = e.logged_at.slice(0,10);
+    if (!(key in aqiMap)) return;
+    if (e.aqi_at_time) aqiMap[key] = e.aqi_at_time;
+    var sev = DIARY_SYMPTOMS.reduce(function(s, sym) { return s + (e[sym]||0); }, 0);
+    sevMap[key] = Math.max(sevMap[key]||0, sev);
+  });
+
+  var labels = days.map(function(d) {
+    var dt = new Date(d + "T12:00:00Z");
+    return dt.toLocaleDateString("en-GB", { day:"numeric", month:"short" });
+  });
+
+  var ctx = document.getElementById("diary-canvas").getContext("2d");
+  if (dChart) dChart.destroy();
+
+  dChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "AQI",
+          data: days.map(function(d) { return aqiMap[d]; }),
+          backgroundColor: "rgba(224,120,67,.25)",
+          borderColor: "#e07843",
+          borderWidth: 1.5,
+          borderRadius: 3,
+          yAxisID: "y",
+          order: 2
+        },
+        {
+          label: "Symptoms",
+          data: days.map(function(d) { return sevMap[d]; }),
+          type: "line",
+          borderColor: "#8b5cf6",
+          backgroundColor: "rgba(139,92,246,.12)",
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: "#8b5cf6",
+          tension: .3,
+          fill: true,
+          yAxisID: "y2",
+          order: 1,
+          spanGaps: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font:{size:10}, color:"#9c8873", maxTicksLimit:8, maxRotation:0 }
+        },
+        y: {
+          position: "left",
+          grid: { color: "rgba(0,0,0,.05)" },
+          ticks: { font:{size:10}, color:"#9c8873", maxTicksLimit:5 },
+          title: { display:true, text:"AQI", font:{size:9}, color:"#e07843" }
+        },
+        y2: {
+          position: "right",
+          min: 0, max: 15,
+          grid: { drawOnChartArea: false },
+          ticks: { font:{size:10}, color:"#8b5cf6", maxTicksLimit:4 },
+          title: { display:true, text:"Symptoms", font:{size:9}, color:"#8b5cf6" }
+        }
+      }
+    }
+  });
+}
+
+async function diaryDelete(id) {
+  if (!confirm("Delete this entry?")) return;
+  await sb.from("diary_entries").delete().eq("id", id);
+  await diaryLoad();
+}
+// ════════════════════════════════════════════════
 </script>
 </body>
 </html>
