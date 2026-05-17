@@ -415,6 +415,45 @@
 
 
 
+
+    /* ── Forecast ── */
+    #forecast-section {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    #forecast-section.visible { display: block; }
+    .forecast-header {
+      font-size: .72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .07em;
+      font-weight: 500; margin-bottom: .9rem;
+    }
+    .forecast-scroll {
+      display: flex; gap: 8px;
+      overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .forecast-scroll::-webkit-scrollbar { display: none; }
+    .forecast-slot {
+      flex-shrink: 0; background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 8px 10px;
+      text-align: center; min-width: 58px;
+    }
+    .forecast-slot.now {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .fc-time { font-size: .65rem; color: var(--muted); margin-bottom: 5px; }
+    .fc-aqi  {
+      font-family: var(--font-head); font-size: 1.15rem;
+      font-weight: 600; line-height: 1; margin-bottom: 3px;
+    }
+    .fc-label { font-size: .58rem; color: var(--muted); line-height: 1.2; }
+
     /* ════ DIARY ════════════════════════════════ */
     #diary-section { margin-bottom: 2rem; }
 
@@ -1138,13 +1177,14 @@ sb.auth.onAuthStateChange(async (event, session) => {
     await loadSavedLocations();
     await loadHealthProfile();
     await loadDigestPreference();
-  } else {
+    diaryRefresh();
+  } else if (event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
     loadThresholdsFromLocal();
     document.getElementById("locations-bar").classList.remove("visible");
     document.getElementById("profile-section").classList.remove("visible");
     document.getElementById("digest-section").classList.remove("visible");
+    diaryRefresh();
   }
-  diaryRefresh();
 });
 
 // ─────────────────────────────────────────────
@@ -1878,6 +1918,7 @@ function diaryResetState() {
 function diaryRefresh() {
   var prompt = document.getElementById("diary-signin-prompt");
   var logBtn = document.getElementById("diary-log-btn");
+  if (!prompt || !logBtn) return;
   if (!currentUser) {
     prompt.style.display = "block";
     logBtn.style.display = "none";
