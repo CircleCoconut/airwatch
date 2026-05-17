@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AirWatch — Air Quality Alerts</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#faf7f2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -453,6 +455,84 @@
       font-weight: 600; line-height: 1; margin-bottom: 3px;
     }
     .fc-label { font-size: .58rem; color: var(--muted); line-height: 1.2; }
+
+
+    /* ── Health profile ── */
+    #profile-section {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    #profile-section.visible { display: block; }
+    .profile-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: .9rem;
+    }
+    .profile-title {
+      font-size: .72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .07em; font-weight: 500;
+    }
+    .profile-saved-badge { font-size: .68rem; color: var(--good); display: none; }
+    .profile-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 1rem;
+    }
+    .profile-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 9px 12px;
+      cursor: pointer; transition: all .15s; user-select: none;
+    }
+    .profile-chip.selected {
+      background: var(--accent-soft); border-color: var(--accent);
+    }
+    .profile-chip-icon { font-size: 1rem; flex-shrink: 0; }
+    .profile-chip-label { font-size: .78rem; color: var(--text); font-weight: 500; }
+    .profile-chip.selected .profile-chip-label { color: var(--accent); }
+    .profile-chip-sub { font-size: .65rem; color: var(--muted); }
+    .profile-note {
+      font-size: .73rem; color: var(--muted); line-height: 1.6;
+      padding: .6rem .8rem; background: var(--surface-2); border-radius: 8px;
+    }
+
+    /* ── Daily digest ── */
+    #digest-section {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    #digest-section.visible { display: block; }
+    .digest-header {
+      font-size: .72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .07em;
+      font-weight: 500; margin-bottom: .75rem;
+    }
+    .digest-row {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .digest-desc { font-size: .8rem; color: var(--text); line-height: 1.5; flex: 1; }
+    .digest-desc span { color: var(--muted); font-size: .73rem; display: block; margin-top: 2px; }
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .toggle-track {
+      position: relative; width: 36px; height: 20px;
+      background: var(--border); border-radius: 10px;
+      cursor: pointer; transition: background .2s; flex-shrink: 0;
+    }
+    .toggle-track.on { background: var(--accent); }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; background: #fff;
+      border-radius: 50%; transition: transform .2s; pointer-events: none;
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(16px); }
+    .toggle-label { font-size: .78rem; color: var(--muted); }
 
     /* ════ DIARY ════════════════════════════════ */
     #diary-section { margin-bottom: 2rem; }
@@ -1177,14 +1257,14 @@ sb.auth.onAuthStateChange(async (event, session) => {
     await loadSavedLocations();
     await loadHealthProfile();
     await loadDigestPreference();
-    diaryRefresh();
-  } else if (event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
+  } else {
     loadThresholdsFromLocal();
     document.getElementById("locations-bar").classList.remove("visible");
     document.getElementById("profile-section").classList.remove("visible");
     document.getElementById("digest-section").classList.remove("visible");
-    diaryRefresh();
   }
+  // Always refresh diary — it reads currentUser internally
+  diaryRefresh();
 });
 
 // ─────────────────────────────────────────────
