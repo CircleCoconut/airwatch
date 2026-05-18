@@ -1216,7 +1216,9 @@
           <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Symptoms</span>
         </div>
       </div>
-      <canvas id="diary-canvas"></canvas>
+      <div style="position:relative;height:160px;width:100%">
+        <canvas id="diary-canvas"></canvas>
+      </div>
     </div>
 
     <div id="diary-list"></div>
@@ -1259,19 +1261,22 @@ let lastAqi = null; // last searched city name
 sb.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   renderAuthHeader();
+
   if (currentUser) {
     await loadThresholdsFromDB();
     await loadSavedLocations();
     await loadHealthProfile();
     await loadDigestPreference();
-  } else {
+    diaryRefresh();
+  } else if (event === "SIGNED_OUT") {
+    // Only clear UI on explicit sign out, not on every null session
     loadThresholdsFromLocal();
     document.getElementById("locations-bar").classList.remove("visible");
     document.getElementById("profile-section").classList.remove("visible");
     document.getElementById("digest-section").classList.remove("visible");
+    diaryRefresh();
   }
-  // Always refresh diary — it reads currentUser internally
-  diaryRefresh();
+  // INITIAL_SESSION with null user = page load before session resolves, ignore
 });
 
 // ─────────────────────────────────────────────
@@ -1349,6 +1354,7 @@ async function submitAuth() {
       document.getElementById("auth-error").style.borderColor = "#86efac";
       document.getElementById("auth-error").style.color = "#166534";
     } else {
+      btn.textContent = "Sign in";
       closeAuthModal();
     }
   }
@@ -1765,13 +1771,23 @@ function maybeNotify(aqi, stationName, category) {
 
   // Handle Google OAuth redirect — exchange hash token for session
   if (window.location.hash && window.location.hash.includes("access_token")) {
-    sb.auth.getSession().then(function(r) {
-      if (r.data && r.data.session) {
-        // Clean the URL so the token isn't visible
-        history.replaceState(null, "", window.location.pathname);
-      }
-    });
+    history.replaceState(null, "", window.location.pathname);
   }
+
+  // Manually check session on load in case the auth listener missed it
+  sb.auth.getSession().then(async function(r) {
+    if (r.data && r.data.session && !currentUser) {
+      currentUser = r.data.session.user;
+      renderAuthHeader();
+      await loadThresholdsFromDB();
+      await loadSavedLocations();
+      await loadHealthProfile();
+      await loadDigestPreference();
+      diaryRefresh();
+    } else if (!r.data.session) {
+      diaryRefresh(); // show sign-in prompt
+    }
+  });
 
   window.addEventListener("load", registerSW);
 
@@ -2238,6 +2254,7 @@ function diaryRenderChart(entries) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       plugins: { legend: { display: false } },
       scales: {
         x: {
