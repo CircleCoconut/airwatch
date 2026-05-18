@@ -14,7 +14,7 @@
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1239,7 +1239,14 @@ const API_BASE = "/api/aqi";
 const SUPABASE_URL  = "https://ofowgnoaaxralsgwiuza.supabase.co";
 const SUPABASE_ANON = "sb_publishable_zhsGDw3W817iXNuSQlEEMw_AlalVVDU";
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    autoRefreshToken:    true,
+    persistSession:      true,
+    detectSessionInUrl:  true,
+    flowType:            "implicit",
+  }
+});
 
 let currentLat = null, currentLon = null;
 let currentUser = null;
@@ -1356,6 +1363,7 @@ async function signInWithGoogle() {
 
 async function signOut() {
   await sb.auth.signOut();
+  window.location.href = window.location.pathname;
 }
 
 // ─────────────────────────────────────────────
@@ -1469,7 +1477,7 @@ async function loadThresholdsFromDB() {
   const { data } = await sb.from("user_thresholds")
     .select("aqi, pm25, pm10")
     .eq("user_id", currentUser.id)
-    .single();
+    .maybeSingle();
   if (data) applyThresholds(data);
 }
 
@@ -1754,6 +1762,17 @@ function maybeNotify(aqi, stationName, category) {
 (function init() {
   loadThresholdsFromLocal();
   showStatus("Search a city or tap GPS to get started.", false);
+
+  // Handle Google OAuth redirect — exchange hash token for session
+  if (window.location.hash && window.location.hash.includes("access_token")) {
+    sb.auth.getSession().then(function(r) {
+      if (r.data && r.data.session) {
+        // Clean the URL so the token isn't visible
+        history.replaceState(null, "", window.location.pathname);
+      }
+    });
+  }
+
   window.addEventListener("load", registerSW);
 
   // Install prompt
@@ -1862,7 +1881,7 @@ async function loadHealthProfile() {
   const { data } = await sb.from("profiles")
     .select("conditions")
     .eq("id", currentUser.id)
-    .single();
+    .maybeSingle();
 
   if (data?.conditions) {
     userConditions = new Set(data.conditions);
@@ -1948,7 +1967,7 @@ async function loadDigestPreference() {
   const { data } = await sb.from("profiles")
     .select("digest_enabled")
     .eq("id", currentUser.id)
-    .single();
+    .maybeSingle();
 
   digestEnabled = data?.digest_enabled ?? false;
   renderDigestToggle();
@@ -2057,7 +2076,7 @@ async function diarySave() {
 
     console.log("Diary save — user:", currentUser.id, "entry:", entry);
 
-    var result = await sb.from("diary_entries").insert(entry).select();
+    var result = await sb.from("diary_entries").insert(entry);
 
     console.log("Diary insert result:", result);
 
